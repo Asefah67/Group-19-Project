@@ -16,3 +16,8 @@ Member 1:
     Name: Ama Sefah
     Role: 
     Issues: 
+
+Member 2:
+    Name: Zuzia Varney 
+    Role:
+    Issues:
