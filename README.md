@@ -22,6 +22,7 @@ Member 1:
     }
 
 Member 2:
-    Name: Zuzia Varney 
-    Role:
-    Issues:
+   {     Name: Zuzia Varney 
+        Role: Note Taker
+        Issues:
+   }
