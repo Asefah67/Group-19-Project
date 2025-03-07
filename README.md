@@ -32,7 +32,7 @@ Member 2:
    
 Member 3:
    {     Name: Chandra Chunduru 
-        Role: Lead Developer
+        Role: Lead Developer and tester
         Issues:
             - Creating Group Design  
             - Data Scraping
