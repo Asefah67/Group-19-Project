@@ -25,4 +25,6 @@ Member 2:
    {     Name: Zuzia Varney 
         Role: Note Taker
         Issues:
+            - Creating study group UI
+            - Getting different data from canvas
    }
