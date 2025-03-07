@@ -20,3 +20,8 @@ Member 1:
             - Study Group Creation Structure
             - In application communication between study groups
     }
+
+Member 2:
+    Name: Zuzia Varney 
+    Role:
+    Issues:
