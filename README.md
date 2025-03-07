@@ -28,3 +28,14 @@ Member 2:
             - Creating study group UI
             - Getting different data from canvas
    }
+
+   
+Member 3:
+   {     Name: Zuzia Varney 
+        Role: Lead Developer
+        Issues:
+            - Creating Group Design  
+            - Data Scraping
+   }
+
+   
