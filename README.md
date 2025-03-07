@@ -31,11 +31,12 @@ Member 2:
 
    
 Member 3:
-   {     Name: Zuzia Varney 
+   {     Name: Chandra Chunduru 
         Role: Lead Developer
         Issues:
             - Creating Group Design  
             - Data Scraping
+            - Data Manipulation
    }
 
    
