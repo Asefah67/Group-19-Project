@@ -13,6 +13,10 @@ Why this project: Being in college can be an isolating and tumultuous experience
 Team Member List:
 
 Member 1: 
-    Name: Ama Sefah
-    Role: 
-    Issues: 
+    {   Name: Ama Sefah
+        Role: Project Manager
+        Issues: 
+            - Home Page/ Navigator Page
+            - Study Group Creation Structure
+            - In application communication between study groups
+    }
