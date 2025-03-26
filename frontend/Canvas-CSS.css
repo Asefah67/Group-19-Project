@@ -1,0 +1,149 @@
+/* OPTIONAL: Use Lato to closely match Canvas; fallback to sans-serif */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+/* Resetting */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* GLOBAL FONT */
+body {
+  font-family: "Lato", sans-serif;
+}
+
+/* WRAPPER for entire layout */
+.canvas-wrap {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* LEFT NAV BAR */
+.canvas-nav {
+  width: 54px; /* EXACT width you found in Canvas */
+  background-color: #ae1b2c; /* Maroon */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.75rem;
+}
+
+/* BRAND AT TOP */
+.nav-brand {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+.nav-brand h2 {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.nav-brand p {
+  font-size: 0.75rem;
+}
+
+/* NAV LIST */
+.nav-list {
+  list-style: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Each link is a small vertical box with an icon placeholder + text */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #fff; /* text color on maroon background */
+  padding: 0.4rem 0;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: #8c1522; /* slightly darker on hover */
+}
+
+/* ICON placeholder in the nav */
+.icon-box {
+  width: 24px;
+  height: 24px;
+  background-color: #fff; /* White icon placeholder */
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+/* TEXT UNDER ICON in the nav */
+.nav-text {
+  font-size: 0.65rem; /* smaller text */
+  display: block;
+  line-height: 1.2;
+}
+
+/* MAIN CONTENT: blank white space */
+.canvas-main {
+  flex: 1;
+  background-color: #fff;
+
+  /* Center the triangle container horizontally and vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container for the triangular layout */
+.triangle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem; /* vertical spacing between rows */
+}
+
+/* Each row of circles */
+.row {
+  display: flex;
+  gap: 2rem; /* horizontal spacing between circles */
+}
+
+/* For the top row (2 circles side by side) */
+.top-row {
+  justify-content: center;
+}
+
+/* For the bottom row (1 circle in the center) */
+.bottom-row {
+  justify-content: center;
+}
+
+/* Circle styling */
+.feature-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background-color: #e6eef5; /* light background color */
+  border: 2px solid #999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Icon inside the circle */
+.feature-icon {
+  font-size: 1.6rem; /* bigger icon */
+  margin-bottom: 0.2rem;
+}
+
+/* Label text inside the circle */
+.feature-label {
+  font-size: 0.85rem;
+  color: #333;
+}
