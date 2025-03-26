@@ -2,7 +2,7 @@
   "type": "module",
   "name": "group-19-project",
   "version": "1.0.0",
-  "description": "Project Title and Team Name: Study Buddy; Team 19",
+  "description": "Study Buddy; Team 19",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
