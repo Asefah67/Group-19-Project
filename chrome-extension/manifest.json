@@ -1,0 +1,30 @@
+{
+    "name": "StudyBuddy Canvas Injector (SVG)",
+    "version": "1.0",
+    "description": "Inject a custom StudyBuddy link with an SVG icon into the Canvas left nav.",
+    "manifest_version": 3,
+  
+    "permissions": [
+      "activeTab",
+      "scripting"
+    ],
+    "host_permissions": [
+      "*://umamherst.instructure.com/*"
+    ],
+  
+    "web_accessible_resources": [
+      {
+        "resources": ["studybuddy-icon.svg"],
+        "matches": ["*://umamherst.instructure.com/*"]
+      }
+    ],
+  
+    "content_scripts": [
+      {
+        "matches": ["*://umamherst.instructure.com/*"],
+        "js": ["content.js"],
+        "run_at": "document_start"
+      }
+    ]
+  }
+  

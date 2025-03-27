@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Canvas Triangular Features</title>
+  <title>StudyBuddy Features</title>
   <link rel="stylesheet" href="Canvas-CSS.css">
 </head>
 <body>
@@ -10,12 +10,10 @@
 <div class="canvas-wrap">
   <!-- LEFT NAV BAR -->
   <nav class="canvas-nav">
-    <!-- Brand at top -->
     <div class="nav-brand">
       <h2>UMass</h2>
       <p>Amherst</p>
     </div>
-
     <ul class="nav-list">
       <li>
         <a href="#" class="nav-item">
@@ -71,8 +69,9 @@
           <span class="nav-text">Help</span>
         </a>
       </li>
+      <!-- StudyBuddy is active and links to itself (this main page) -->
       <li>
-        <a href="#" class="nav-item">
+        <a href="Canvas-Layout.html" class="nav-item">
           <div class="icon-box"></div>
           <span class="nav-text">StudyBuddy</span>
         </a>
@@ -103,9 +102,15 @@
           <span class="feature-label">Progress Tracker</span>
         </div>
       </div>
-    </div>
+    </nav>
   </main>
-</div>
 
+  <script>
+    function navigate(id) {
+      window.location.href = id;
+    }
+  </script>
+
+</div>
 </body>
 </html>
