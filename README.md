@@ -39,4 +39,7 @@ Member 3:
             - Data Manipulation
    }
 
+   Features to add: Room booking, Study Groups, Slides/Echo 360 video transcripts to assignments. Must create search algorithm, kind of a ai, but only course content, with
+   slight additives of the english dictionary to create comprehensive sentences. 
    
+   Lecture quizzes - Student will click class, then the lecture. The student 
