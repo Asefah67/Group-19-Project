@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="Canvas-CSS.css">
 </head>
 <body>
+
 <div class="canvas-wrap">
   <!-- LEFT NAV BAR -->
   <nav class="canvas-nav">
@@ -80,27 +81,35 @@
 
   <!-- MAIN CONTENT (white space) -->
   <main class="canvas-main">
+    <!-- Triangular layout container -->
     <div class="triangle-container">
+      <!-- Top row: 2 circles -->
       <div class="row top-row">
         <div class="feature-circle">
           <span class="feature-icon">👥</span>
           <span class="feature-label">Study Group</span>
         </div>
         <div class="feature-circle">
-          <a href="../room-booking/roombooking.html" class="feature-link">
-            <span class="feature-icon">📅</span>
-            <span class="feature-label">Room Booking</span>
-          </a>
+          <span class="feature-icon">📅</span>
+          <span class="feature-label">Room Booking</span>
         </div>
       </div>
+
+      <!-- Bottom row: 1 circle centered -->
       <div class="row bottom-row">
         <div class="feature-circle">
-          <span class="feature-icon">🔄</span>
-          <span class="feature-label">Chat</span>
+          <button onclick="navigate('\source\chatView.html')">Chat</button>
         </div>
       </div>
-    </div>
+    </nav>
   </main>
+
+  <script>
+    function navigate(id) {
+      window.location.href = id;
+    }
+  </script>
+
 </div>
 </body>
 </html>
