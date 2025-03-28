@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Messages</title>
+  <link rel="stylesheet" href="chatView.css">
+</head>
+<body>
+
+<div class="canvas-wrap">
+  <!-- LEFT NAV BAR -->
+  <nav class="canvas-nav">
+    <!-- Brand at top -->
+    <div class="nav-brand">
+      <h2>UMass</h2>
+      <p>Amherst</p>
+    </div>
+
+    <ul class="nav-list">
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Account</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Courses</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Groups</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Calendar</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Inbox</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">History</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Studio</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">Help</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item">
+          <div class="icon-box"></div>
+          <span class="nav-text">StudyBuddy</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT (white space) -->
+  <main class="canvas-main">
+    <!-- Triangular layout container -->
+    <div class="triangle-container">
+      <!-- Top row: 2 circles -->
+      <!-- Bottom row: 1 circle centered -->
+      <div class="row bottom-row">
+          <div class="sidebar">
+            <div class="sidebar-header">Messages </div>
+            <!--Fake data-->
+            <div class="conversation-list">
+              <div class="conversation" onclick="message_retrieval(this)" id="Group 19 Study Group">
+                <!--In actual implementation, "id" would be group_name which would be stored in a database-->
+                <img src="https://via.placeholder.com/40" alt="Group 19">
+                <div class="conversation-info">
+                    <div class="conversation-name">Group 19 Study Group</div>
+                    <div class="conversation-preview">Let's study!</div>
+                </div>
+            </div>
+            <div class="conversation" onclick="message_retrieval(this)" id="Comp Sci 311 Group">
+              <img src="https://via.placeholder.com/40" alt="CS311">
+              <div class="conversation-info">
+                  <div class="conversation-name">Comp Sci 311 Group</div>
+                  <div class="conversation-preview">When is the midterm?</div>
+              </div>
+            </div>
+        </div>
+        <div>
+          <button class="create">Create Group</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="chat-view" id="chatView">
+    Welcome to your messages!
+</div>
+
+<div class="chat-container" id="chatContainer">
+  <div class="chat-header" id="chatHeader">
+    Group 19
+  </div>
+  <div class="chat-messages" id="chatMessages">
+
+  </div>
+  <div class="chat-input">
+    <input type="text" placeholder="Type a message">
+    <button>Send</button>
+  </div>
+</div>
+
+<script>
+  function message_retrieval(group) {
+
+    let id = group.id;
+
+    document.getElementById("chatView").style.display = "none";
+
+    document.getElementById("chatContainer").style.display = "flex";
+
+    document.getElementById("chatHeader").innerText = id;
+  }
+</script>
+
+
+</body>
+</html>
