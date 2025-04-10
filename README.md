@@ -39,7 +39,15 @@ Member 3:
             - Data Manipulation
    }
 
-   Features to add: Room booking, Study Groups, Slides/Echo 360 video transcripts to assignments. Must create search algorithm, kind of a ai, but only course content, with
-   slight additives of the english dictionary to create comprehensive sentences. 
-   
-   Lecture quizzes - Student will click class, then the lecture. The student 
+
+   ### Room Booking
+
+Our room booking feature allows students to reserve a study room directly from within StudyBuddy. Users can choose from different locations, categories, and dates to view available time slots in a grid. They can select a preferred slot, review the booking details in a confirmation modal, and finally submit their booking. Once submitted, the reservation is saved locally (using IndexedDB), so students can see their chosen slot persist even if they refresh the page.
+
+**How it works:**
+- A dynamic grid of available time slots is generated from data stored in local JSON files.
+- Filters let the user select a location, category, and date.
+- Users can click on an available slot to select it. A trash icon lets them easily cancel that selection.
+- A “Confirm” button opens a modal where they enter their name, an @umass.edu email, and the group size.
+- When the booking is submitted, a confirmation message “Reservation stored locally” appears, and the reservation is saved via IndexedDB.
+
