@@ -2,126 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Room Booking</title>
-  <!-- Link to the global CSS from the frontend folder -->
+  <title>StudyBuddy · Room Booking</title>
+
+  <!-- global layout / nav -->
   <link rel="stylesheet" href="../frontend/Canvas-CSS.css">
+
+  <!-- page‑only tweaks -->
+  <style>
+    .reservation-container{max-width:1000px;margin:0 auto;}
+    .booking-filters{display:flex;flex-wrap:wrap;gap:1rem;margin:1.5rem 0}
+    .booking-filters select{min-width:180px;padding:.4rem;border-radius:4px}
+    #confirmBtn{padding:.55rem 1.2rem;background:#ae1b2c;color:#fff;
+                border:none;border-radius:4px;cursor:pointer}
+    #confirmBtn:disabled{opacity:.4;cursor:not-allowed}
+    #gridWrapper{margin-top:1rem;overflow:auto}
+    /* little trash icon */
+    .trash{cursor:pointer;margin-left:.25rem;color:#c0392b;font-weight:700}
+  </style>
 </head>
 <body>
 <div class="canvas-wrap">
-  <!-- LEFT NAV BAR -->
+
+  <!-- ===== LEFT NAV – full set again ===== -->
   <nav class="canvas-nav">
-    <div class="nav-brand">
-      <h2>UMass</h2>
-      <p>Amherst</p>
-    </div>
+    <div class="nav-brand"><h2>UMass</h2><p>Amherst</p></div>
     <ul class="nav-list">
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Account</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Dashboard</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Courses</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Groups</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Calendar</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Inbox</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">History</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Studio</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">Help</span>
-        </a>
-      </li>
-      <!-- StudyBuddy icon active: links to main page -->
-      <li>
-        <a href="../frontend/Canvas-Layout.html" class="nav-item">
-          <div class="icon-box"></div>
-          <span class="nav-text">StudyBuddy</span>
-        </a>
-      </li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Account</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Dashboard</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Courses</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Groups</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Calendar</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Inbox</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">History</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Studio</span></a></li>
+      <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Help</span></a></li>
+      <li><a class="nav-item" href="../frontend/Canvas-Layout.html">
+          <div class="icon-box"></div><span class="nav-text">StudyBuddy</span></a></li>
     </ul>
   </nav>
 
-  <!-- MAIN CONTENT AREA -->
+  <!-- ===== MAIN ===== -->
   <main class="canvas-main">
-    <div class="booking-container">
-      <h1>Room Booking</h1>
-      <p>Please fill out the form below to find a suitable room.</p>
-      <!-- Form that submits to timeslots.html -->
-      <form action="timeslots.html" method="get" class="booking-form">
-        <label for="groupName">Which group are you booking for?</label>
-        <input list="groups" id="groupName" name="groupName" placeholder="Enter group name..." required>
-        <datalist id="groups">
-          <option value="Alpha Group">
-          <option value="Beta Group">
-          <option value="Charlie Group">
-        </datalist>
+    <div class="reservation-container">
+      <h1>Spaces & Reservations</h1>
 
-        <label for="location">Location:</label>
-        <select id="location" name="location">
-          <option value="DuBois">W. E. B. Du Bois Library</option>
-          <option value="Science">Science & Engineering Library</option>
-          <option value="Wadsworth">Wadsworth Library</option>
-        </select>
+      <!-- filter bar -->
+      <div class="booking-filters">
+        <label><strong>Location</strong><br>
+          <select id="locationSel">
+            <option value="">All</option>
+            <option value="du-bois">W. E. B. Du Bois Library</option>
+            <option value="science">Science & Engineering Library</option>
+            <option value="wadsworth">Wadsworth Library</option>
+          </select>
+        </label>
 
-        <label for="category">Category:</label>
-        <select id="category" name="category">
-          <option value="Group Study Spaces">Learning Commons - Group Study Spaces</option>
-          <option value="Extended Reality Rooms">Digital Media Lab - Extended Reality Rooms</option>
-          <option value="Media Production Rooms">Digital Media Lab - Media Production Rooms</option>
-          <option value="Sound Rooms">Digital Media Lab - Sound Rooms</option>
-        </select>
+        <label><strong>Category</strong><br>
+          <select id="categorySel">
+            <option value="">All</option>
+            <option>Group Study Spaces</option>
+            <option>Extended Reality Rooms</option>
+            <option>Media Production Rooms</option>
+            <option>Sound Rooms</option>
+          </select>
+        </label>
 
-        <label for="capacity">Capacity:</label>
-        <select id="capacity" name="capacity">
-          <option value="All">All Spaces (not seats)</option>
-          <option value="5-8">Space For 5-8 people</option>
-        </select>
+        <label><strong>Date</strong><br>
+          <input type="date" id="dateSel" value="2025-04-10">
+        </label>
 
-        <label for="bookingDate">Date:</label>
-        <input type="date" id="bookingDate" name="bookingDate" value="2025-03-27">
+        <!-- this is now our confirm button -->
+        <button id="confirmBtn" disabled>Confirm Selection</button>
+      </div>
 
-        <button type="submit">Search Rooms</button>
-      </form>
+      <!-- dynamic grid + selection read‑out -->
+      <h2 id="dateHeading"></h2>
+      <div id="gridWrapper"></div>
+
+      <h3 style="margin-top:1.5rem">Your Selection</h3>
+      <ul id="selectionList"></ul>
     </div>
   </main>
 </div>
+
+<script src="js/room-booking.js" defer></script>
 </body>
 </html>
