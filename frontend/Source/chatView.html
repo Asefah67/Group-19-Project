@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Messages</title>
+
   <link rel="stylesheet" href="chatView.css">
 </head>
 <body>
@@ -91,22 +92,38 @@
             <div class="sidebar-header">Messages </div>
             <!--Fake data-->
             <div class="conversation-list">
-              <div class="conversation" onclick="message_retrieval(this)" id="Group 19 Study Group">
+              <div class="conversation" onclick="viewSwap(this)" id="Group19StudyGroup">
                 <!--In actual implementation, "id" would be group_name which would be stored in a database-->
                 <img src="https://via.placeholder.com/40" alt="Group 19">
                 <div class="conversation-info">
                     <div class="conversation-name">Group 19 Study Group</div>
                     <div class="conversation-preview">Let's study!</div>
                 </div>
-            </div>
-            <div class="conversation" onclick="message_retrieval(this)" id="Comp Sci 311 Group">
-              <img src="https://via.placeholder.com/40" alt="CS311">
-              <div class="conversation-info">
-                  <div class="conversation-name">Comp Sci 311 Group</div>
-                  <div class="conversation-preview">When is the midterm?</div>
+              </div>
+              <div class="conversation" onclick= "viewSwap(this)" id="CompSci311Group">
+                <img src="https://via.placeholder.com/40" alt="CS311">
+                <div class="conversation-info">
+                    <div class="conversation-name">Comp Sci 311 Group</div>
+                    <div class="conversation-preview">When is the midterm?</div>
+                </div>
               </div>
             </div>
-        </div>
+            <script type="module">
+              import {chatRoomFakeServer} from './chatRoomFakeServer.js';
+              
+              const div = document.querySelectorAll('div.conversation');
+              window.message_logs = {};
+              window.lastRender = {}
+
+              div.forEach(div => {
+                const id = String(div.id) + "fakeServer";
+                if (div.id) {
+                  message_logs[id] = new chatRoomFakeServer(div.id);
+                  lastRender[id] = 0;
+
+                }
+              })
+            </script>
         <div>
           <button class="create">Create Group</button>
         </div>
@@ -127,22 +144,84 @@
 
   </div>
   <div class="chat-input">
-    <input type="text" placeholder="Type a message">
-    <button>Send</button>
+    <input id="message" type="text" placeholder="Type a message">
+    <button id="send_bttn" onclick="handleSend('message')">Send</button>
   </div>
 </div>
 
 <script>
-  function message_retrieval(group) {
+
+  let current_gc = "Group19StudyGroup";
+
+  function viewSwap(group) {
+
+    current_gc = group.id;
+    document.getElementById("chatMessages").innerHTML = '';
+    lastRender[current_gc + "fakeServer"] = 0;
+    rendermsg(group)
+  }
+
+
+  function rendermsg(group) {
 
     let id = group.id;
+
+
 
     document.getElementById("chatView").style.display = "none";
 
     document.getElementById("chatContainer").style.display = "flex";
 
     document.getElementById("chatHeader").innerText = id;
+
+
+
+    const log = message_logs[id + "fakeServer"]
+    //log.get_msg(input_id);
+    const messages = log.fetch();
+
+    let lastR = lastRender[id + "fakeServer"];
+
+
+    const container = document.getElementById("chatMessages");
+
+    if (!messages) {
+      return;
+    }
+
+    for (let i = lastR; i < messages.length; i++) {
+      console.log(i);
+      const msg = messages[i];
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble';
+      bubble.innerHTML = `
+        ${msg.text}
+        <div class = "timestamp"> ${new Date(msg.created).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit'})}</div>`
+      container.prepend(bubble)
+    }
+
+    lastRender[id + "fakeServer"] = messages.length;
   }
+
+  
+  function handleSend(input_id) {
+    let log = message_logs[current_gc + "fakeServer"]
+
+    if (!log) {
+      message_logs[current_gc + "fakeServer"] = new chatRoomFakeServer(current_gc);
+      log = message_logs[current_gc + "fakeServer"]
+    }
+
+    log.get_msg(input_id);
+
+    document.getElementById(input_id).value = ""
+    
+    rendermsg(document.getElementById(current_gc));
+
+  }
+
+
+  
 </script>
 
 
