@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join Group</title>
+  <link rel="stylesheet" href="create-group.css" />
+</head>
+<body>
+  <div class="container">
+    <span class="icon">🔍</span>
+    <h1>Join Group</h1>
+
+    <form class="group-form" id="searchForm">
+      <div class="spacer"></div>
+      <label for="search-class" class="subheader">Search by Class Name</label>
+      <input type="text" id="search-class" placeholder="Enter class name" required />
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="spacer"></div>
+    <h2 class="subheader">Available Groups</h2>
+    <div class="group-list" id="searchResults"></div>
+  </div>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const className = document.getElementById('search-class').value.trim().toLowerCase();
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.innerHTML = '';
+
+      const groups = JSON.parse(localStorage.getItem('groups')) || [];
+      const matches = groups.filter(group => group.className.toLowerCase() === className);
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = '<div class="group-block">No groups found for that class.</div>';
+      } else {
+        matches.forEach(group => {
+          const div = document.createElement('div');
+          div.className = 'group-block';
+          div.textContent = `${group.className}: ${group.groupName}`;
+          resultsContainer.appendChild(div);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
