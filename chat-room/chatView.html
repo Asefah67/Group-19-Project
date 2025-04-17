@@ -166,8 +166,6 @@
 
     let id = group.id;
 
-
-
     document.getElementById("chatView").style.display = "none";
 
     document.getElementById("chatContainer").style.display = "flex";
@@ -206,7 +204,6 @@
   
   function handleSend(input_id) {
     let log = message_logs[current_gc + "fakeServer"]
-
     if (!log) {
       message_logs[current_gc + "fakeServer"] = new chatRoomFakeServer(current_gc);
       log = message_logs[current_gc + "fakeServer"]
@@ -215,9 +212,8 @@
     log.get_msg(input_id);
 
     document.getElementById(input_id).value = ""
-    
+  
     rendermsg(document.getElementById(current_gc));
-
   }
 
 
