@@ -91,3 +91,59 @@ button {
 button:hover {
   background-color: #8c1522;
 }
+
+.group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.group-block {
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  padding: 1rem;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.full-width {
+  width: 90vw;
+  max-width: none;
+  height: 90vh;
+  text-align: left;
+  overflow-y: auto;
+}
+
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 2rem; 
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
