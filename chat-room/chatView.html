@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Messages</title>
-
   <link rel="stylesheet" href="chatView.css">
+  <script type="module" src="chatRoom.js"></script>
+  <script type="module" src="chatRoomFakeServer.js"></script>
 </head>
 <body>
 
@@ -100,29 +101,10 @@
                     <div class="conversation-preview">Let's study!</div>
                 </div>
               </div>
-              <div class="conversation" onclick= "viewSwap(this)" id="CompSci311Group">
-                <img src="https://via.placeholder.com/40" alt="CS311">
-                <div class="conversation-info">
-                    <div class="conversation-name">Comp Sci 311 Group</div>
-                    <div class="conversation-preview">When is the midterm?</div>
-                </div>
-              </div>
             </div>
-            <script type="module">
-              import {chatRoomFakeServer} from './chatRoomFakeServer.js';
-              
-              const div = document.querySelectorAll('div.conversation');
-              window.message_logs = {};
-              window.lastRender = {}
-
-              div.forEach(div => {
-                const id = String(div.id) + "fakeServer";
-                if (div.id) {
-                  message_logs[id] = new chatRoomFakeServer(div.id);
-                  lastRender[id] = 0;
-
-                }
-              })
+            <script type="module" src="chatRoomFakeServer.js">
+              //import {chatRoomFakeServer} from './chatRoomFakeServer.js';
+            
             </script>
         <div>
           <button class="create">Create Group</button>
@@ -141,17 +123,74 @@
     Group 19
   </div>
   <div class="chat-messages" id="chatMessages">
-
   </div>
+
+  <button class="menu-button" id="menu-button">⋮</button>
+    <div class="dropdown">
+      <button id="members">Members</button>
+      <button onclick="">Settings</button>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <h3>Members</h3>
+        <ul>       
+
+        </ul>
+        <button id="close_members">Close</button>
+      </div>
+    </div>
+
   <div class="chat-input">
-    <input id="message" type="text" placeholder="Type a message">
+    <input id="message" type="text" placeholder="Type a message...">
     <button id="send_bttn" onclick="handleSend('message')">Send</button>
   </div>
 </div>
 
-<script>
 
-  let current_gc = "Group19StudyGroup";
+
+
+
+
+<script src="chatRoom.js" type="module">
+
+  /*let current_gc = "Group19StudyGroup";
+
+  const menu = document.getElementById("menu-button");
+
+
+  const viewMembersButton = document.getElementById("members");
+
+  viewMembersButton.addEventListener("click", function(e) {
+    let modal_over = document.getElementById("modalOverlay");
+    let members = message_logs[current_gc + "fakeServer"].get_members()
+
+    document.getElementById("modalOverlay").style.display = 'flex';
+  })
+
+  menu.addEventListener("click", function(e) {
+    const dropdown = menu.nextElementSibling;
+
+    document.querySelectorAll(".dropdown").forEach(item => {
+      if (item !== dropdown) {
+        item.style.display = 'none';
+      }
+    });
+
+    dropdown.style.display = dropdown.style.display === 'block'? 'none': 'block'
+  })
+
+
+  document.addEventListener("click", function(e) {
+    if (!e.target.closest('.menu-button')) {
+      document.querySelectorAll('.dropdown').forEach(item => item.style.display = 'none')
+    }
+  });
+
+
+  document.getElementById("members").addEventListener("click", function(e) {
+    let members = document.createElement('div');
+  })
 
   function viewSwap(group) {
 
@@ -214,12 +253,10 @@
     document.getElementById(input_id).value = ""
   
     rendermsg(document.getElementById(current_gc));
-  }
+  }*/
 
 
   
 </script>
-
-
 </body>
 </html>
