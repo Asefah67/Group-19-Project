@@ -1,23 +1,15 @@
 {
-  "type": "module",
   "name": "group-19-project",
   "version": "1.0.0",
-  "description": "Study Buddy; Team 19",
-  "main": "index.js",
+  "type": "module",
+  "description": "Study Buddy – Team 19",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "node-canvas-api": "^2.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "webpack": "^5.98.0",
-    "webpack-cli": "^6.0.1"
+    "node-canvas-api": "^2.0.0"
   }
-  
 }
