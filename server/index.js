@@ -22,7 +22,10 @@ app.use(
     express.static(path.join(__dirname, '..')),
     express.static(path.join(__dirname, '../js'))
   );
-  
+  // serve your compiled front-end & room-booking pages too
+app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/room-booking', express.static(path.join(__dirname, '../room-booking')));
+
 /* ---------- routes ---------- */
 // GET /api/rooms?location=du-bois&date=2025-04-10
 app.get('/api/rooms', (req, res) => {

@@ -15,55 +15,73 @@ indexedDB.open('studyBuddy', 1).onsuccess = e => { db = e.target.result; };
 const chosen = new Set();   // “room|time”
 let currentMeta = {};       // { room,time,date,loc }
 
-/* ========= initial load ========= */
-loadGrid();
-$('#searchBtn').onclick = loadGrid;
+/* ========= on‐load & “Search” button ========= */
+window.addEventListener('DOMContentLoaded', loadGrid);
+$('#searchBtn').addEventListener('click', loadGrid);
 
 async function loadGrid () {
+  // clear previous
   $('#gridWrapper').innerHTML = '';
-  $('#dateHeading').textContent =
-    new Date($('#dateSel').value).toDateString();
+  $('#selectionList').innerHTML = '';
+  chosen.clear();
+  $('#confirmBtn').disabled = true;
 
+  // header
+  const dateVal = $('#dateSel').value;
+  $('#dateHeading').textContent = new Date(dateVal).toDateString();
+
+  // fetch data
   const loc  = $('#locationSel').value || 'du-bois';
-  const date = $('#dateSel').value;       // yyyy-mm-dd
-  const resp = await fetch(`http://localhost:3000/api/rooms?location=${loc}&date=${date}`);
-
-  if (!resp.ok) { alert('No data for that date/location'); return; }
+  const resp = await fetch(`http://localhost:3000/api/rooms?location=${loc}&date=${dateVal}`);
+  if (!resp.ok) {
+    alert('No data for that date/location');
+    return;
+  }
   const data = await resp.json();
   drawGrid(data);
 }
 
-/* ========= build grid ========= */
+/* ========= build the grid ========= */
 function drawGrid (data) {
-  const times = ['7:00','7:30','8:00','8:30','9:00','9:30','10:00','10:30',
-                 '11:00','11:30','12:00','12:30','13:00'];
+  const times = [
+    '7:00','7:30','8:00','8:30','9:00','9:30',
+    '10:00','10:30','11:00','11:30','12:00','12:30','13:00'
+  ];
 
   const wrap = $('#gridWrapper');
   const g = document.createElement('div');
   g.className = 'slot-grid';
   g.style.gridTemplateColumns = `200px repeat(${times.length},50px)`;
 
-  // header row
+  // top‐left spacer
   g.appendChild(document.createElement('div'));
-  times.forEach(t=>{
-    const h=document.createElement('div');
-    h.className='slot-head'; h.textContent=t;
+
+  // time headers
+  times.forEach(t => {
+    const h = document.createElement('div');
+    h.className = 'slot-head';
+    h.textContent = t;
     g.appendChild(h);
   });
 
-  data.rooms.forEach((r,idx)=>{
-    const lbl=document.createElement('div');
-    lbl.className='slot-room';
-    lbl.textContent=`${r.name} (Cap ${r.cap})`;
+  // one row per room
+  data.rooms.forEach((r, idx) => {
+    // room label
+    const lbl = document.createElement('div');
+    lbl.className = 'slot-room';
+    lbl.textContent = `${r.name} (Cap ${r.cap})`;
     g.appendChild(lbl);
 
-    times.forEach(t=>{
-      const cell=document.createElement('div');
-      const status=data.slots[idx][t]==='busy'?'busy':'free';
-      cell.className=`slot-cell ${status}`;
-      cell.dataset.room=r.name;
-      cell.dataset.time=t;
-      if(status==='free') cell.onclick=()=>toggle(cell);
+    // each timeslot
+    times.forEach(t => {
+      const cell = document.createElement('div');
+      const status = (data.slots[idx][t] === 'busy') ? 'busy' : 'free';
+      cell.className = `slot-cell ${status}`;
+      cell.dataset.room = r.name;
+      cell.dataset.time = t;
+      if (status === 'free') {
+        cell.addEventListener('click', () => toggle(cell));
+      }
       g.appendChild(cell);
     });
   });
@@ -73,48 +91,62 @@ function drawGrid (data) {
 
 /* ========= selection UX ========= */
 function toggle (cell) {
-  const key = cell.dataset.room+'|'+cell.dataset.time;
+  const key = cell.dataset.room + '|' + cell.dataset.time;
   if (chosen.has(key)) {
-    chosen.delete(key); cell.classList.remove('chosen');
+    chosen.delete(key);
+    cell.classList.remove('chosen');
   } else {
+    // only one selection at a time
+    document.querySelectorAll('.chosen').forEach(c => c.classList.remove('chosen'));
     chosen.clear();
-    document.querySelectorAll('.chosen').forEach(c=>c.classList.remove('chosen'));
-    chosen.add(key); cell.classList.add('chosen');
+    chosen.add(key);
+    cell.classList.add('chosen');
   }
   renderSelection();
 }
 
 function renderSelection () {
   const list = $('#selectionList');
-  list.innerHTML='';
-  if (!chosen.size) { $('#confirmBtn').disabled=true; return; }
+  list.innerHTML = '';
+  if (!chosen.size) {
+    $('#confirmBtn').disabled = true;
+    return;
+  }
 
-  const [room,time] = [...chosen][0].split('|');
+  const [room, time] = [...chosen][0].split('|');
   currentMeta = {
-    room,time,
+    room,
+    time,
     date: $('#dateSel').value,
     loc : $('#locationSel').value || 'du-bois'
   };
 
-  const li=document.createElement('li');
-  li.textContent=`${room} – ${time}`;
-  const trash=document.createElement('span');
-  trash.textContent=' 🗑'; trash.className='trash';
-  trash.onclick=()=>{ chosen.clear(); renderSelection(); };
+  const li = document.createElement('li');
+  li.textContent = `${room} – ${time}`;
+  const trash = document.createElement('span');
+  trash.textContent = ' 🗑';
+  trash.className = 'trash';
+  trash.addEventListener('click', () => {
+    chosen.clear();
+    renderSelection();
+  });
   li.appendChild(trash);
   list.appendChild(li);
 
-  $('#confirmBtn').disabled=false;
+  $('#confirmBtn').disabled = false;
 }
 
 /* ========= confirmation modal ========= */
-$('#confirmBtn').onclick = () => openConfirmation();
+$('#confirmBtn').addEventListener('click', openConfirmation);
 
 function openConfirmation () {
-  const bg=document.createElement('div');
-  bg.style.cssText='position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:99';
-  const box=document.createElement('div');
-  box.style.cssText='background:#fff;padding:2rem 2.5rem;border-radius:6px;max-width:420px;width:100%';
+  // backdrop
+  const bg = document.createElement('div');
+  bg.style.cssText = 'position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:99';
+
+  // dialog
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;padding:2rem 2.5rem;border-radius:6px;max-width:420px;width:100%';
   box.innerHTML = `
     <h2 style="margin-top:0">Booking Details</h2>
     <table style="width:100%;margin-bottom:1rem;border-collapse:collapse">
@@ -139,35 +171,49 @@ function openConfirmation () {
   bg.appendChild(box);
   document.body.appendChild(bg);
 
-  $('#submitBtn').onclick = async () => {
-    if (!$('#fullName').value || !$('#email').value.endsWith('@umass.edu') || !$('#groupSize').value) {
-      alert('Please fill out every required field.'); return;
+  // form submit
+  $('#submitBtn').addEventListener('click', async () => {
+    const name  = $('#fullName').value.trim();
+    const email = $('#email').value.trim();
+    const group = $('#groupSize').value;
+    if (!name || !email.endsWith('@umass.edu') || !group) {
+      return alert('Please fill out every required field.');
     }
 
-    /* ---------- POST to Express ---------- */
-    await fetch('http://localhost:3000/api/reservations',{
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
+    // 1) POST to Express back-end
+    await fetch('http://localhost:3000/api/reservations', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({
         location: currentMeta.loc,
         date    : currentMeta.date,
         room    : currentMeta.room,
         time    : currentMeta.time,
-        name    : $('#fullName').value,
-        email   : $('#email').value,
-        group   : $('#groupSize').value
+        name,
+        email,
+        group
       })
     });
 
-    /* optional: also keep local copy */
-    const tx=db.transaction('reservations','readwrite')
-               .objectStore('reservations')
-               .add({...currentMeta,name:$('#fullName').value});
+    // 2) also keep local copy in IndexedDB
+    const tx = db.transaction('reservations','readwrite')
+                 .objectStore('reservations')
+                 .add({
+                   ...currentMeta,
+                   name,
+                   email,
+                   group
+                 });
     tx.oncomplete = () => {
       alert('Reservation stored (server + local)');
-      bg.remove(); chosen.clear(); renderSelection();
+      bg.remove();
+      chosen.clear();
+      renderSelection();
     };
-  };
+  });
 
-  bg.onclick = e => { if(e.target===bg) bg.remove(); };
+  // close if click outside dialog
+  bg.addEventListener('click', e => {
+    if (e.target === bg) bg.remove();
+  });
 }
