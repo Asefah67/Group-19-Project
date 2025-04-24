@@ -2,11 +2,18 @@ export class chatRoomFakeServer {
 
     #groupName
     #chatLogs
+    #group_members
 
     constructor(group_id) {
         this.#groupName = group_id;
         this.#chatLogs = [];
+        this.#group_members = [];
     }
+
+    get_members() {
+        return [...this.#group_members]
+    }
+
 
     get_msg(input_id) {
 
