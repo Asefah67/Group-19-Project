@@ -109,14 +109,34 @@ function rendermsg(group) {
 }
 
   
-export function handleSend(input_id) {
-    let log = message_logs[current_gc + "fakeServer"]
+export async function handleSend(input_id) {
+
+    let msg = document.getElementById(input_id).value;
+
+    fetch('http://localhost:3000/api/chat-room', {
+      method: 'POST',
+      headers: {'Content-Type': "application/json"},
+      body: JSON.stringify({
+        current_gc,
+        msg
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.error("Error:", err));
+
+
+    /*let log = message_logs[current_gc + "fakeServer"]
     if (!log) {
       message_logs[current_gc + "fakeServer"] = new chatRoomFakeServer(current_gc);
       log = message_logs[current_gc + "fakeServer"]
     }
 
-    log.get_msg(input_id);
+    log.get_msg(input_id);*/
+
+    /*if (response.ok) {
+      console.log("Message Stored!")
+    }*/
 
     document.getElementById(input_id).value = ""
   

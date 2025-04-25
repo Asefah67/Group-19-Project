@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="chatView.css">
   <script type="module" src="chatRoom.js"></script>
   <script type="module" src="chatRoomFakeServer.js"></script>
-  <iframe id="frame" src="../create-group/create-group.html"></iframe> 
 
 </head>
 <body>
@@ -94,7 +93,7 @@
           <div class="sidebar">
             <div class="sidebar-header">Messages </div>
             <!--Fake data-->
-            <div class="conversation-list">
+            <div class="conversation-list" id="conversation-list">
               <div class="conversation" onclick="viewSwap(this)" id="Group19StudyGroup">
                 <!--In actual implementation, "id" would be group_name which would be stored in a database-->
                 <img src="https://via.placeholder.com/40" alt="Group 19">
@@ -260,8 +259,9 @@
   }*/
 
 
+
   
 </script>
-<script type="module" src="/chat-room/createGC.js"></script>
+<script type="module" src="./createGC.js"></script>
 </body>
 </html>
