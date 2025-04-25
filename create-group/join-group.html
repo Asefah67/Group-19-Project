@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Join Group</title>
   <link rel="stylesheet" href="create-group.css" />
+  <style>
+    /* Extra styles to center the success message and button */
+    .success-container {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .success-container button {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -24,24 +37,63 @@
   </div>
 
   <script>
-    document.getElementById('searchForm').addEventListener('submit', function (e) {
+    document.getElementById('searchForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const className = document.getElementById('search-class').value.trim().toLowerCase();
       const resultsContainer = document.getElementById('searchResults');
       resultsContainer.innerHTML = '';
 
-      const groups = JSON.parse(localStorage.getItem('groups')) || [];
-      const matches = groups.filter(group => group.className.toLowerCase() === className);
+      try {
+        const response = await fetch('/api/groups');
+        const groups = await response.json();
 
-      if (matches.length === 0) {
-        resultsContainer.innerHTML = '<div class="group-block">No groups found for that class.</div>';
-      } else {
-        matches.forEach(group => {
-          const div = document.createElement('div');
-          div.className = 'group-block';
-          div.textContent = `${group.className}: ${group.groupName}`;
-          resultsContainer.appendChild(div);
-        });
+        const matches = groups.filter(group => group.className.toLowerCase() === className);
+
+        if (matches.length === 0) {
+          resultsContainer.innerHTML = '<div class="group-block">No groups found for that class.</div>';
+        } else {
+          matches.forEach(group => {
+            const div = document.createElement('div');
+            div.className = 'group-block';
+            div.textContent = `${group.className}: ${group.groupName}`;
+
+            div.addEventListener('click', async () => {
+              const username = prompt('Enter your username to join the group:');
+              if (!username) return;
+
+              try {
+                const res = await fetch('/api/join-group', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    className: group.className,
+                    groupName: group.groupName,
+                    username
+                  })
+                });
+
+                const result = await res.json();
+
+                // ✅ Clear the page and show a success message and button
+                document.body.innerHTML = `
+                  <div class="success-container">
+                    <h2>You successfully joined the group!</h2>
+                    <button onclick="location.href='/create-group/group-home.html'">Return to Group Home</button>
+                  </div>
+                `;
+
+              } catch (err) {
+                console.error('Error joining group:', err);
+                alert('Failed to join group.');
+              }
+            });
+
+            resultsContainer.appendChild(div);
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        resultsContainer.innerHTML = '<div class="group-block">Error fetching groups.</div>';
       }
     });
   </script>
