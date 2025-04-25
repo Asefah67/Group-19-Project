@@ -1,5 +1,14 @@
 {
-        "Groups": [
-            
+        "groups": [
+            {
+                "className": "Computer Science 311",
+                "groupName": "Comp Sci 311 baddies",
+                "members": [
+                        "Ama",
+                        "Tiye",
+                        "June"
+                ],
+                "status": false
+            }
         ]
 }
