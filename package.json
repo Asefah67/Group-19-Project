@@ -1,7 +1,6 @@
 {
   "name": "group-19-project",
   "version": "1.0.0",
-  "type": "module",
   "description": "Study Buddy – Team 19",
   "scripts": {
     "start": "node server/index.js"
