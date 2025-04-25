@@ -1,3 +1,4 @@
+// server/index.js
 import express   from 'express';
 import cors      from 'cors';
 import fs        from 'fs';
@@ -10,47 +11,46 @@ const __dirname  = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ---------- middleware ---------- */
 app.use(cors());
 app.use(express.json());
 
-/* serve EVERY front-end file */
+// serve your static front-end…
 app.use(express.static(path.join(__dirname, '..')));
-
-// serve all files in the parent “room-booking” folder as static
-app.use(
-    express.static(path.join(__dirname, '..')),
-    express.static(path.join(__dirname, '../js'))
-  );
-  // serve your compiled front-end & room-booking pages too
-app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/room-booking', express.static(path.join(__dirname, '../room-booking')));
 
-/* ---------- routes ---------- */
-// GET /api/rooms?location=du-bois&date=2025-04-10
+// GET /api/rooms …
 app.get('/api/rooms', (req, res) => {
   const location = (req.query.location || 'du-bois').toLowerCase();
-  const date     = req.query.date;                           // yyyy-mm-dd
-  if (!date) return res.status(400).json({ error:'Missing date' });
+  const date     = req.query.date;
+  if (!date) return res.status(400).json({ error: 'Missing date' });
 
   const file = path.join(__dirname, 'data', 'rooms', `${location}-${date}.json`);
   fs.readFile(file, 'utf8', (err, json) => {
-    if (err) return res.status(404).json({ error:'No data for that day/loc' });
+    if (err) return res.status(404).json({ error: 'No data for that day/loc' });
     res.json(JSON.parse(json));
   });
 });
 
-// POST /api/reservations   → appends to data/reservations.json
+// POST /api/reservations
 app.post('/api/reservations', (req, res) => {
   const dbFile = path.join(__dirname, 'data', 'reservations.json');
   fs.readFile(dbFile, 'utf8', (err, json) => {
-    const arr = err ? [] : JSON.parse(json);
+    let arr = [];
+    if (!err) {
+      try {
+        arr = JSON.parse(json);
+      } catch {
+        arr = [];  // if parse fails, start fresh
+      }
+    }
     arr.push(req.body);
-    fs.writeFile(dbFile, JSON.stringify(arr, null, 2), () =>
-      res.json({ status:'ok' })
-    );
+    fs.writeFile(dbFile, JSON.stringify(arr, null, 2), writeErr => {
+      if (writeErr) return res.status(500).json({ error: 'Failed to save' });
+      res.json({ status: 'ok' });
+    });
   });
 });
 
-/* ---------- start ---------- */
-app.listen(PORT, () => console.log(`API & static server on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`API & static server on http://localhost:${PORT}`)
+);
