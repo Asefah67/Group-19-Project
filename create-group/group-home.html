@@ -29,34 +29,54 @@
     <div class="modal-content">
       <span class="close">&times;</span>
       <h3 id="modalTitle">Group Members</h3>
-      <p>No members yet.</p>
+      <ul id="modalMembers"></ul>
     </div>
   </div>
 
-  <script src="create-group.js"></script>
   <script>
     const groupListEl = document.getElementById('groupList');
-    const groups = JSON.parse(localStorage.getItem('groups')) || [];
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMembers = document.getElementById('modalMembers');
+    const modal = document.getElementById('memberModal');
+    const closeModal = document.querySelector('.close');
 
-    if (groups.length === 0) {
-      groupListEl.innerHTML = '<div class="group-block">No groups yet!</div>';
-    } else {
-      groups.forEach(group => {
-        const div = document.createElement('div');
-        div.className = 'group-block';
-        div.textContent = `${group.className}: ${group.groupName}`;
+    fetch('/api/groups')
+      .then(res => res.json())
+      .then(groups => {
+        if (groups.length === 0) {
+          groupListEl.innerHTML = '<div class="group-block">No groups yet!</div>';
+        } else {
+          groups.forEach(group => {
+            const div = document.createElement('div');
+            div.className = 'group-block';
+            div.textContent = `${group.className}: ${group.groupName}`;
 
-        div.addEventListener('click', () => {
-          document.getElementById('modalTitle').textContent = `${group.className}: ${group.groupName}`;
-          document.getElementById('memberModal').classList.remove('hidden');
-        });
+            div.addEventListener('click', () => {
+              modalTitle.textContent = `${group.className}: ${group.groupName}`;
+              modalMembers.innerHTML = '';
+              if (group.members.length > 0) {
+                group.members.forEach(member => {
+                  const li = document.createElement('li');
+                  li.textContent = member;
+                  modalMembers.appendChild(li);
+                });
+              } else {
+                modalMembers.innerHTML = '<li>No members yet.</li>';
+              }
+              modal.classList.remove('hidden');
+            });
 
-        groupListEl.appendChild(div);
+            groupListEl.appendChild(div);
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Error loading groups:', err);
+        groupListEl.innerHTML = '<div class="group-block">Error loading groups.</div>';
       });
-    }
 
-    document.querySelector('.close').addEventListener('click', () => {
-      document.getElementById('memberModal').classList.add('hidden');
+    closeModal.addEventListener('click', () => {
+      modal.classList.add('hidden');
     });
   </script>
 </body>

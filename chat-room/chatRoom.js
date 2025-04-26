@@ -1,0 +1,174 @@
+import { chatRoomFakeServer } from "./chatRoomFakeServer.js";
+
+
+let current_gc = "Group19StudyGroup";
+
+const div = document.querySelectorAll('div.conversation');
+window.message_logs = {};
+window.lastRender = {}
+
+div.forEach(div => {
+  const id = String(div.id) + "fakeServer";
+  if (div.id) {
+    message_logs[id] = new chatRoomFakeServer(div.id);
+    lastRender[current_gc] = 0;
+
+  }
+})
+
+
+
+
+const menu = document.getElementById("menu-button");
+const viewMembersButton = document.getElementById("members");
+
+viewMembersButton.addEventListener("click", function(e) {
+    let modal_over = document.getElementById("modalOverlay");
+    let members = message_logs[current_gc + "fakeServer"].get_members()
+
+    document.getElementById("modalOverlay").style.display = 'flex';
+})
+
+
+menu.addEventListener("click", function(e) {
+    const dropdown = menu.nextElementSibling;
+
+    document.querySelectorAll(".dropdown").forEach(item => {
+      if (item !== dropdown) {
+        item.style.display = 'none';
+      }
+    });
+
+    dropdown.style.display = dropdown.style.display === 'block'? 'none': 'block'
+})
+
+
+document.addEventListener("click", function(e) {
+    if (!e.target.closest('.menu-button')) {
+      document.querySelectorAll('.dropdown').forEach(item => item.style.display = 'none')
+    }
+});
+
+document.getElementById("close_members").addEventListener("click", function(e) {
+    document.getElementById("modalOverlay").style.display = "none"
+})
+
+
+export function viewSwap(group) {
+    current_gc = group.id;
+    document.getElementById("chatMessages").innerHTML = '';
+    lastRender[current_gc + "fakeServer"] = 0;
+    rendermsg(group)
+}
+
+export function createGroup(element) {
+    element.innerHTML = ""
+
+    const new_gc = document.createElement('div')
+    new_gc.classList.add("conversation")
+    element.appendChild(new_gc);
+    
+}
+
+async function fetchMessages() {
+  return await fetch('http://localhost:3000/chat-room')
+    .then(response => response.json())  // Parse the response as JSON
+    .then(data => {
+      console.log('Messages:', data); 
+      return data;
+    })
+    .catch(error => {
+      console.error('Error fetching messages:', error);  // Handle errors
+      return []
+    });
+
+}
+
+async function rendermsg(group) {
+
+    let id = group.id;
+
+    document.getElementById("chatView").style.display = "none";
+
+    document.getElementById("chatContainer").style.display = "flex";
+
+    document.getElementById("chatHeader").innerText = id;
+
+
+
+    //const log = message_logs[id + "fakeServer"]
+    //log.get_msg(input_id);
+    //const messages = log.fetch();
+
+     // Log the fetched messages
+      // You can use the data to display messages in your UI here
+
+      let lastR = lastRender[current_gc];
+      
+
+
+      const container = document.getElementById("chatMessages");
+
+      const data = fetchMessages().then(val => {
+      /*if (!data) {
+        return;
+      }*/
+        for (const group in val.messages) {
+          console.log(group)
+          if (group === current_gc)
+            for (let i = lastR; i < group.length; i++) {
+              console.log(i);
+              const msg = group[i];
+              const bubble = document.createElement('div');
+              bubble.className = 'chat-bubble';
+              bubble.innerHTML = `
+                ${msg.text}
+                <div class = "timestamp"> ${new Date(msg.created).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit'})}</div>`
+              container.prepend(bubble)
+            }
+          }
+
+      })
+
+      lastRender[id + "fakeServer"] = data.length;
+}
+
+
+  
+export async function handleSend(input_id) {
+
+    let msg = document.getElementById(input_id).value;
+
+    fetch('http://localhost:3000/chat-room', {
+      method: 'POST',
+      headers: {'Content-Type': "application/json"},
+      body: JSON.stringify({
+        msg,
+        current_gc
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.error("Error:", err));
+
+
+    /*let log = message_logs[current_gc + "fakeServer"]
+    if (!log) {
+      message_logs[current_gc + "fakeServer"] = new chatRoomFakeServer(current_gc);
+      log = message_logs[current_gc + "fakeServer"]
+    }
+
+    log.get_msg(input_id);*/
+
+    /*if (response.ok) {
+      console.log("Message Stored!")
+    }*/
+
+    document.getElementById(input_id).value = ""
+  
+    rendermsg(document.getElementById(current_gc));
+}
+
+window.viewSwap = viewSwap;
+window.handleSend = handleSend;
+window.createGroup = createGroup;
