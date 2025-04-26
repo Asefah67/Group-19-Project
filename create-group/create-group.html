@@ -11,39 +11,23 @@
     <span class="icon">👥</span>
     <h1>Create Group</h1>
 
-    <form class="group-form" id="createForm">
-      <div class="spacer"></div>
-      <label for="class-name" class="subheader">Class Name</label>
-      <input type="text" id="class-name" name="class-name" placeholder="Enter class name" required>
-
-      <div class="spacer"></div>
-      <label for="group-name" class="subheader">Group Name</label>
-      <input type="text" id="group-name" name="group-name" placeholder="Enter group name" required>
-
-      <div class="spacer"></div>
-      <button type="submit">Create</button>
-    </form>
-  </div>
-
-  <script>
-    document.getElementById('createForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const className = document.getElementById('class-name').value.trim();
-      const groupName = document.getElementById('group-name').value.trim();
-
-      const response = await fetch('/api/create-group', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ className, groupName })
-      });
-
-      if (response.ok) {
-        window.location.href = 'group-home.html';
-      } else {
-        alert('Failed to create group.');
-      }
-    });
-  </script>
+        <form class="group-form">
+            <div class="spacer"></div>
+ 
+            <label for="class-name" class="subheader">Class Name</label>
+            <input type="text" id="class-name" name="class-name" placeholder="Enter class name" required>
+            
+            <div class="spacer"></div>
+            
+            <label for="group-name" class="subheader">Group Name</label>
+            <input type="text" id="group-name" name="group-name" placeholder="Enter group name" required>
+            
+            <div class="spacer"></div>
+            
+            
+            <button id="create_group"type="submit">Create</button>
+        </form>
+    </div>
+    <script src="create-group.js"></script>
 </body>
 </html>
