@@ -1,6 +1,8 @@
 import { chatRoomFakeServer } from "./chatRoomFakeServer.js";
 
 
+let current_gc = "Group19StudyGroup";
+
 const div = document.querySelectorAll('div.conversation');
 window.message_logs = {};
 window.lastRender = {}
@@ -9,13 +11,13 @@ div.forEach(div => {
   const id = String(div.id) + "fakeServer";
   if (div.id) {
     message_logs[id] = new chatRoomFakeServer(div.id);
-    lastRender[id] = 0;
+    lastRender[current_gc] = 0;
 
   }
 })
 
 
-let current_gc = "Group19StudyGroup";
+
 
 const menu = document.getElementById("menu-button");
 const viewMembersButton = document.getElementById("members");
@@ -68,8 +70,21 @@ export function createGroup(element) {
     
 }
 
+async function fetchMessages() {
+  return await fetch('http://localhost:3000/chat-room')
+    .then(response => response.json())  // Parse the response as JSON
+    .then(data => {
+      console.log('Messages:', data); 
+      return data;
+    })
+    .catch(error => {
+      console.error('Error fetching messages:', error);  // Handle errors
+      return []
+    });
 
-function rendermsg(group) {
+}
+
+async function rendermsg(group) {
 
     let id = group.id;
 
@@ -81,44 +96,55 @@ function rendermsg(group) {
 
 
 
-    const log = message_logs[id + "fakeServer"]
+    //const log = message_logs[id + "fakeServer"]
     //log.get_msg(input_id);
-    const messages = log.fetch();
+    //const messages = log.fetch();
 
-    let lastR = lastRender[id + "fakeServer"];
+     // Log the fetched messages
+      // You can use the data to display messages in your UI here
+
+      let lastR = lastRender[current_gc];
+      
 
 
-    const container = document.getElementById("chatMessages");
+      const container = document.getElementById("chatMessages");
 
-    if (!messages) {
-      return;
-    }
+      const data = fetchMessages().then(val => {
+      /*if (!data) {
+        return;
+      }*/
+        for (const group in val.messages) {
+          console.log(group)
+          if (group === current_gc)
+            for (let i = lastR; i < group.length; i++) {
+              console.log(i);
+              const msg = group[i];
+              const bubble = document.createElement('div');
+              bubble.className = 'chat-bubble';
+              bubble.innerHTML = `
+                ${msg.text}
+                <div class = "timestamp"> ${new Date(msg.created).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit'})}</div>`
+              container.prepend(bubble)
+            }
+          }
 
-    for (let i = lastR; i < messages.length; i++) {
-      console.log(i);
-      const msg = messages[i];
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble';
-      bubble.innerHTML = `
-        ${msg.text}
-        <div class = "timestamp"> ${new Date(msg.created).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit'})}</div>`
-      container.prepend(bubble)
-    }
+      })
 
-    lastRender[id + "fakeServer"] = messages.length;
+      lastRender[id + "fakeServer"] = data.length;
 }
+
 
   
 export async function handleSend(input_id) {
 
     let msg = document.getElementById(input_id).value;
 
-    fetch('http://localhost:3000/api/chat-room', {
+    fetch('http://localhost:3000/chat-room', {
       method: 'POST',
       headers: {'Content-Type': "application/json"},
       body: JSON.stringify({
-        current_gc,
-        msg
+        msg,
+        current_gc
       })
     })
     .then(res => res.json())

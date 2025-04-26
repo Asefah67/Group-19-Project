@@ -2,5 +2,8 @@
     "liveServer.settings.port": 5501,
     "cSpell.words": [
         "Tiye"
+    ],
+    "liveServer.settings.ignoreFiles": [
+        "**/messages.json"
     ]
 }
