@@ -27,15 +27,24 @@ router.post('/create-group', (req, res) => {
   }
 
   const data = readGroups();
-  data.groups.push({
+
+  // 🔒 Check for existing group name (case-insensitive)
+  const exists = data.groups.some(group => group.groupName.toLowerCase() === groupName.toLowerCase());
+  if (exists) {
+    return res.status(400).json({ error: 'Group name already exists' });
+  }
+
+  const newGroup = {
     className,
     groupName,
     members: [],
     status: false
-  });
+  };
 
+  data.groups.push(newGroup);
   writeGroups(data);
-  res.status(201).json({ message: 'Group created successfully' });
+
+  res.status(201).json({ message: 'Group created successfully', id: newGroup.id });
 });
 
 router.post('/join-group', (req, res) => {
