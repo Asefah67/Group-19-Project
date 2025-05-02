@@ -1,3 +1,4 @@
+// group-data-logic.js
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -27,6 +28,12 @@ router.post('/create-group', (req, res) => {
   }
 
   const data = readGroups();
+
+  const exists = data.groups.some(group => group.groupName.toLowerCase() === groupName.toLowerCase());
+  if (exists) {
+    return res.status(400).json({ error: 'Group name already exists' });
+  }
+
   data.groups.push({
     className,
     groupName,
