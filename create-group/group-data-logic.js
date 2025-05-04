@@ -1,22 +1,50 @@
 const express = require('express');
-const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+
 const router = express.Router();
+const db = new sqlite3.Database(path.join(__dirname, '../database.sqlite'));
 
-const GROUPS_FILE = path.join(__dirname, 'groups.json');
+// Ensure table has className column
+const ensureSchema = () => {
+  db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS groups (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      className TEXT NOT NULL
+    )`);
 
-function readGroups() {
-  const data = fs.readFileSync(GROUPS_FILE, 'utf-8');
-  return JSON.parse(data);
-}
+    db.run(`CREATE TABLE IF NOT EXISTS members (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      FOREIGN KEY (group_id) REFERENCES groups(id)
+    )`);
+  });
+};
 
-function writeGroups(groupsData) {
-  fs.writeFileSync(GROUPS_FILE, JSON.stringify(groupsData, null, 2));
-}
+ensureSchema();
 
 router.get('/groups', (req, res) => {
-  const data = readGroups();
-  res.json(data.groups);
+  const query = `
+    SELECT g.id, g.name AS groupName, g.className, m.name AS memberName
+    FROM groups g
+    LEFT JOIN members m ON g.id = m.group_id
+  `;
+
+  db.all(query, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const groups = {};
+    rows.forEach(({ id, groupName, className, memberName }) => {
+      if (!groups[id]) {
+        groups[id] = { groupName, className, members: [] };
+      }
+      if (memberName) groups[id].members.push(memberName);
+    });
+
+    res.json(Object.values(groups));
+  });
 });
 
 router.post('/create-group', (req, res) => {
@@ -26,25 +54,15 @@ router.post('/create-group', (req, res) => {
     return res.status(400).json({ error: 'Missing className or groupName' });
   }
 
-  const data = readGroups();
+  db.get(`SELECT * FROM groups WHERE name = ? AND className = ?`, [groupName, className], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (row) return res.status(400).json({ error: 'Group already exists for that class' });
 
-  // 🔒 Check for existing group name (case-insensitive)
-  const exists = data.groups.some(group => group.groupName.toLowerCase() === groupName.toLowerCase());
-  if (exists) {
-    return res.status(400).json({ error: 'Group name already exists' });
-  }
-
-  const newGroup = {
-    className,
-    groupName,
-    members: [],
-    status: false
-  };
-
-  data.groups.push(newGroup);
-  writeGroups(data);
-
-  res.status(201).json({ message: 'Group created successfully', id: newGroup.id });
+    db.run(`INSERT INTO groups(name, className) VALUES (?, ?)`, [groupName, className], function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.status(201).json({ message: 'Group created successfully', id: this.lastID });
+    });
+  });
 });
 
 router.post('/join-group', (req, res) => {
@@ -54,20 +72,24 @@ router.post('/join-group', (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const data = readGroups();
-  const group = data.groups.find(g => g.className === className && g.groupName === groupName);
+  db.get(`SELECT id FROM groups WHERE name = ? AND className = ?`, [groupName, className], (err, group) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
 
-  if (!group) {
-    return res.status(404).json({ error: 'Group not found' });
-  }
+    db.get(`SELECT * FROM members WHERE group_id = ? AND name = ?`, [group.id, username], (err, member) => {
+      if (err) return res.status(500).json({ error: err.message });
 
-  if (!group.members.includes(username)) {
-    group.members.push(username);
-    writeGroups(data);
-    return res.status(200).json({ message: 'User added to group' });
-  }
+      if (member) {
+        return res.status(200).json({ message: 'User already a member of the group' });
+      }
 
-  res.status(200).json({ message: 'User already a member of the group' });
+      db.run(`INSERT INTO members(group_id, name) VALUES (?, ?)`, [group.id, username], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        res.status(200).json({ message: 'User added to group' });
+      });
+    });
+  });
 });
 
 module.exports = router;
