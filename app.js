@@ -15,7 +15,7 @@ app.use('/create-group', express.static(path.join(__dirname, 'create-group')));
 app.use(express.static(path.join(__dirname, 'Landing Page')));
 
 // ✅ Your backend API routes
-app.use('/api', groupRoutes);
+app.use('/', groupRoutes);
 
 // ✅ Set landing page (Canvas) as root
 app.get('/', (req, res) => {
