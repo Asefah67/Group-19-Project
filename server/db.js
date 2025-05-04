@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('chat.db');
+const db = new sqlite3.Database('./database.sqlite');
+
 
 module.exports = db;
 
@@ -16,15 +17,16 @@ db.serialize(() => {
     FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
   )`);
 
-  db.run(`CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    group_id INTEGER NOT NULL,
-    sender TEXT NOT NULL,
-    content TEXT NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
-  )`);
-});
+  db.run(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      groupName TEXT,
+      sender TEXT,
+      content TEXT,
+      timestamp TEXT
+    )
+  `);
+  })
 
 db.close(() => {
   console.log('Database schema created.');

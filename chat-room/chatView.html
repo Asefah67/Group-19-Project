@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Messages</title>
-  <link rel="stylesheet" href="chatView.css">
-  <script type="module" src="chatRoom.js"></script>
-  <script type="module" src="chatRoomFakeServer.js"></script>
+  <link rel="stylesheet" href="./chatView.css">
+  <script type="module" src="./chatRoom.js"></script>
 
 </head>
 <body>
@@ -94,14 +93,6 @@
             <div class="sidebar-header">Messages </div>
             <!--Fake data-->
             <div class="conversation-list" id="conversation-list">
-              <div class="conversation" onclick="viewSwap(this)" id="Group19StudyGroup">
-                <!--In actual implementation, "id" would be group_name which would be stored in a database-->
-                <img src="https://via.placeholder.com/40" alt="Group 19">
-                <div class="conversation-info">
-                    <div class="conversation-name">Group 19 Study Group</div>
-                    <div class="conversation-preview">Let's study!</div>
-                </div>
-              </div>
             </div>
             <script type="module" src="chatRoomFakeServer.js">
               //import {chatRoomFakeServer} from './chatRoomFakeServer.js';

@@ -1,23 +1,25 @@
-import { chatRoomFakeServer } from "./chatRoomFakeServer.js";
+import eventBus from '../server/eventBus.js';
 
 
-let current_gc = "Group19StudyGroup";
+let current_gc = "";
+const backend = 'http://localhost:3000';
 
-const div = document.querySelectorAll('div.conversation');
-window.message_logs = {};
+
 window.lastRender = {}
 
-div.forEach(div => {
-  const id = String(div.id) + "fakeServer";
-  if (div.id) {
-    message_logs[id] = new chatRoomFakeServer(div.id);
-    lastRender[current_gc] = 0;
+eventBus.addEventListener('groupCreated', (group) => {
+  const element = document.getElementById("conversation-list")
+  element.innerHTML = ""
 
-  }
+  const new_gc = document.createElement('div')
+  new_gc.classList.add("conversation")
+  new_gc.id = group.name
+  new_gc.onclick = viewSwap(new_gc)
+  
+  element.appendChild(new_gc);
+
+  lastRender[group.name] = null;
 })
-
-
-
 
 const menu = document.getElementById("menu-button");
 const viewMembersButton = document.getElementById("members");
@@ -57,9 +59,10 @@ document.getElementById("close_members").addEventListener("click", function(e) {
 export function viewSwap(group) {
     current_gc = group.id;
     document.getElementById("chatMessages").innerHTML = '';
-    lastRender[current_gc + "fakeServer"] = 0;
+    lastRender[current_gc] = null;
     rendermsg(group)
 }
+
 
 export function createGroup(element) {
     element.innerHTML = ""
@@ -70,23 +73,33 @@ export function createGroup(element) {
     
 }
 
-async function fetchMessages() {
-  return await fetch('http://localhost:3000/chat-room')
-    .then(response => response.json())  // Parse the response as JSON
-    .then(data => {
-      console.log('Messages:', data); 
-      return data;
-    })
-    .catch(error => {
-      console.error('Error fetching messages:', error);  // Handle errors
-      return []
-    });
 
+async function fetchmsg(group, after = null) {
+  let call = `${backend}/groups/${encodeURIComponent(group)}/messages`
+
+  if (after) {
+    call += `?after=${encodeURIComponent(after)}`
+  }
+
+  try {
+    const response = await fetch(call)
+
+    if (!response.ok) {
+      throw new Error(`Error fetching for current group`)
+    }
+
+    const data = await response.json()
+    return data;
+  } catch (e) {
+    console.error(`New Error: ${e}`)
+  }
 }
+
 
 async function rendermsg(group) {
 
     let id = group.id;
+    current_gc = id;
 
     document.getElementById("chatView").style.display = "none";
 
@@ -95,74 +108,66 @@ async function rendermsg(group) {
     document.getElementById("chatHeader").innerText = id;
 
 
+      let last_r ;
 
-    //const log = message_logs[id + "fakeServer"]
-    //log.get_msg(input_id);
-    //const messages = log.fetch();
+      if (!lastRender[current_gc]) {
+        lastRender[current_gc] = null;
+      }
+        last_r = lastRender[current_gc]
 
-     // Log the fetched messages
-      // You can use the data to display messages in your UI here
-
-      let lastR = lastRender[current_gc];
-      
+        const container = document.getElementById("chatMessages");
 
 
-      const container = document.getElementById("chatMessages");
-
-      const data = fetchMessages().then(val => {
-      /*if (!data) {
-        return;
-      }*/
-        for (const group in val.messages) {
-          console.log(group)
-          if (group === current_gc)
-            for (let i = lastR; i < group.length; i++) {
-              console.log(i);
-              const msg = group[i];
+        await fetchmsg(current_gc, last_r)
+        .then((messages) => {  
+          if (messages.length > 0) { 
+            lastRender[current_gc] = messages[messages.length - 1].timestamp;  
+            messages.forEach(msg => {
+              console.log(msg);
               const bubble = document.createElement('div');
               bubble.className = 'chat-bubble';
               bubble.innerHTML = `
-                ${msg.text}
-                <div class = "timestamp"> ${new Date(msg.created).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit'})}</div>`
+                ${msg.content}
+                <div class = "timestamp"> ${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit'})}</div>`
               container.prepend(bubble)
-            }
+            })
           }
+        })
+}
+  
+async function create_group_indb(groupName) {
+  const res = await fetch (`${backend}/groups`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name: groupName
+    })
+  })
 
-      })
-
-      lastRender[id + "fakeServer"] = data.length;
+  if (!res.ok) {
+    return new Error (`Cannot create group: ${res.status}`)
+  }
 }
 
 
-  
 export async function handleSend(input_id) {
 
     let msg = document.getElementById(input_id).value;
+    let sender = "Anonymous"
 
-    fetch('http://localhost:3000/chat-room', {
+
+    await fetch(`${backend}/groups/${current_gc}/messages`, {
       method: 'POST',
       headers: {'Content-Type': "application/json"},
       body: JSON.stringify({
-        msg,
-        current_gc
+        sender: sender,
+        content: msg,
       })
     })
     .then(res => res.json())
     .then(data => console.log(data))
     .catch(err => console.error("Error:", err));
 
-
-    /*let log = message_logs[current_gc + "fakeServer"]
-    if (!log) {
-      message_logs[current_gc + "fakeServer"] = new chatRoomFakeServer(current_gc);
-      log = message_logs[current_gc + "fakeServer"]
-    }
-
-    log.get_msg(input_id);*/
-
-    /*if (response.ok) {
-      console.log("Message Stored!")
-    }*/
 
     document.getElementById(input_id).value = ""
   
