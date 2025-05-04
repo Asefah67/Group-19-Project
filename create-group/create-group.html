@@ -41,7 +41,8 @@
       if (response.ok) {
         window.location.href = 'group-home.html';
       } else {
-        alert('Failed to create group.');
+        const error = await response.json();
+        alert(error.error || 'Failed to create group.');
       }
     });
   </script>
