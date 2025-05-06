@@ -2,26 +2,44 @@
   "name": "StudyBuddy Canvas Injector",
   "version": "1.0",
   "manifest_version": 3,
-  "description": "Inject a StudyBuddy link into Canvas and swap in our custom layout on demand.",
+  "description": "Inject a StudyBuddy link into Canvas and swap in our custom layout on demand, plus remove frame-blocking headers for UMass LibCal.",
+
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
   ],
+
   "host_permissions": [
-    "*://*.instructure.com/*"
+    "*://*.instructure.com/*",
+    "*://*.library.umass.edu/*"
   ],
+
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "remove-frame-headers",
+        "enabled": true,
+        "path": "dnr-rules.json"
+      }
+    ]
+  },
+
   "web_accessible_resources": [
     {
       "resources": [
         "studybuddy-icon.svg",
         "Canvas-Layout.html",
-        "Canvas-CSS.css"
+        "Canvas-CSS.css",
+        "views/roombooking.html"
       ],
       "matches": [
         "*://*.instructure.com/*"
       ]
     }
   ],
+
   "content_scripts": [
     {
       "matches": ["*://*.instructure.com/*"],
