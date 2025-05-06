@@ -1,0 +1,23 @@
+/* OPTIONAL: Lato font */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Lato",sans-serif; }
+
+/* The same 54px-wide fixed left nav area */
+.canvas-nav { position:fixed; top:0; left:0; width:54px; height:100vh; background:#ae1b2c; display:flex; flex-direction:column; align-items:center; padding-top:.75rem; z-index:9999; }
+.canvas-main { margin-left:54px; padding:2rem; background:#fff; min-height:100vh; }
+
+/* center our injected panel in that workspace */
+.studybuddy-center { display:flex; justify-content:center; align-items:center; height:100%; }
+
+/* your triangle layout */
+.triangle-container { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2rem; }
+.row { display:flex; gap:2rem; justify-content:center; }
+.feature-circle {
+  width:130px; height:130px; border-radius:50%;
+  background:#e6eef5; border:2px solid #999;
+  display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+}
+.feature-icon { font-size:1.6rem; margin-bottom:.2rem; }
+.feature-label { font-size:.85rem; color:#333; }

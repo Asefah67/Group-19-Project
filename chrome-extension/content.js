@@ -1,66 +1,67 @@
-console.log("StudyBuddy content script loaded!");
+// content.js
+console.log("🔌 StudyBuddy injector loaded");
 
-function injectStudyBuddyLink() {
-  // If it's already injected, skip
-  if (document.getElementById('global_nav_studybuddy_link')) return;
+// 1) Inject our “StudyBuddy” nav link if it isn’t already there
+;(function injectNavLink(){
+  if (document.getElementById("global_nav_studybuddy")) return;
+  const ul = document.querySelector(".ic-app-header__menu-list");
+  if (!ul) return;
 
-  // Target the <ul> that holds the nav items
-  const navList = document.querySelector('.ic-app-header__menu-list');
-  if (!navList) return;
+  const li = document.createElement("li");
+  li.id = "global_nav_studybuddy";
+  li.setAttribute("role","none");
+  li.innerHTML = `
+    <a role="menuitem" class="ic-app-header__menu-list-link" href="#">
+      <span class="menu-item__icon">
+        <img src="${chrome.runtime.getURL("studybuddy-icon.svg")}"
+             alt="StudyBuddy" width="24" height="24">
+      </span>
+      <span class="menu-item__text">StudyBuddy</span>
+    </a>
+  `;
 
-  // Create <li>
-  const customMenuItem = document.createElement('li');
-  customMenuItem.id = 'global_nav_studybuddy_link';
-  customMenuItem.setAttribute('role', 'none');
+  ul.appendChild(li);
 
-  // Create <a> link
-  const customLink = document.createElement('a');
-  customLink.setAttribute('role', 'menuitem');
-  customLink.classList.add('ic-app-header__menu-list-link');
-  customLink.href = '#';
-
-  // Create icon wrapper
-  const iconWrapper = document.createElement('span');
-  iconWrapper.classList.add('menu-item__icon');
-
-  // Create <img> with the SVG icon
-  const iconImg = document.createElement('img');
-  iconImg.src = chrome.runtime.getURL('studybuddy-icon.svg');
-  iconImg.alt = 'StudyBuddy Icon';
-  // Force consistent sizing
-  iconImg.style.width = '24px';
-  iconImg.style.height = '24px';
-
-  // Put <img> inside the wrapper
-  iconWrapper.appendChild(iconImg);
-
-  // Create text wrapper
-  const textWrapper = document.createElement('span');
-  textWrapper.classList.add('menu-item__text');
-  textWrapper.textContent = 'StudyBuddy';
-
-  // Append icon + text to <a>
-  customLink.appendChild(iconWrapper);
-  customLink.appendChild(textWrapper);
-
-  // Optional click
-  customLink.addEventListener('click', (e) => {
+  // bind click
+  li.querySelector("a").addEventListener("click", e => {
     e.preventDefault();
-    alert("You clicked StudyBuddy!");
+    loadStudyBuddyLayout().catch(err => console.error(err));
   });
 
-  // Append <a> to <li>, then <li> to nav <ul>
-  customMenuItem.appendChild(customLink);
-  navList.appendChild(customMenuItem);
+  console.log("✅ StudyBuddy nav link injected");
+})();
 
-  console.log("StudyBuddy menu item injected with SVG!");
+let cssInjected = false;
+
+// 2) On click, fetch & inject our Canvas-Layout.html into Canvas’s main area
+async function loadStudyBuddyLayout(){
+  // a) fetch the snippet
+  const resp = await fetch(chrome.runtime.getURL("Canvas-Layout.html"));
+  if (!resp.ok) throw new Error("Failed to load Canvas-Layout.html");
+  const text = await resp.text();
+  const doc = new DOMParser().parseFromString(text, "text/html");
+  const newPanel = doc.querySelector(".canvas-main");
+  if (!newPanel) throw new Error("⛔ .canvas-main not found in your snippet");
+
+  // b) inject our CSS exactly once
+  if (!cssInjected){
+    const link = document.createElement("link");
+    link.id = "studybuddy-css";
+    link.rel = "stylesheet";
+    link.href = chrome.runtime.getURL("Canvas-CSS.css");
+    document.head.appendChild(link);
+    cssInjected = true;
+  }
+
+  // c) find Canvas’s workspace
+  let workspace =
+    document.querySelector(".ic-app-main")     // attempt #1
+    || document.querySelector("main")          // #2
+    || document.querySelector("#content")      // #3
+    || document.body;                          // fallback
+
+  // clear & swap
+  workspace.innerHTML = "";
+  workspace.appendChild(newPanel.cloneNode(true));
+  console.log("🔄 StudyBuddy layout injected");
 }
-
-// Observe DOM changes so we can insert ASAP
-const observer = new MutationObserver(() => {
-  injectStudyBuddyLink();
-});
-observer.observe(document.documentElement, { childList: true, subtree: true });
-
-// Try once immediately
-injectStudyBuddyLink();
