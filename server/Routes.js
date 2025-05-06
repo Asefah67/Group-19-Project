@@ -177,7 +177,7 @@ app.listen(PORT, () => {
 
 
 
-/*MILESTONE 7 STUFF 
+/*MILESTONE 6 STUFF 
 const filepath = path.join(__dirname, '../server/data/messages.json')
 async function readMessages() {
     const data = fs.readFileSync(filepath, 'utf-8');

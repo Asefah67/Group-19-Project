@@ -210,6 +210,7 @@ body {
 
 /* Chat View (Placeholder for now) */
 .chat-view {
+  width: 75vw;
   flex: 1;
   display: flex;
   flex-direction: column;

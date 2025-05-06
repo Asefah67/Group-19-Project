@@ -1,4 +1,4 @@
-import eventBus from '../server/eventBus.js';
+const eventBus = require('../server/eventBus')
 
 
 let current_gc = "";

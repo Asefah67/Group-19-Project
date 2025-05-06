@@ -1,3 +1,5 @@
+const EventEmitter = require('events')
 
-const eventBus = new EventTarget();
-export default eventBus;
+const eventBus = new EventEmitter();
+
+module.exports = eventBus
