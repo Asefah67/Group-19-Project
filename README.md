@@ -51,3 +51,9 @@ Our room booking feature allows students to reserve a study room directly from w
 - A “Confirm” button opens a modal where they enter their name, an @umass.edu email, and the group size.
 - When the booking is submitted, a confirmation message “Reservation stored locally” appears, and the reservation is saved via IndexedDB.
 
+
+
+
+What we have left:
+
+authorization page to get student access 

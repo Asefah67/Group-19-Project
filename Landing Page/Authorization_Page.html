@@ -1,1 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>StudyBuddy Authorization</title>
+  <!-- Canvas-style CSS -->
+  <link rel="stylesheet" href="Canvas-CSS.css">
+  <style>
+    /* center the auth panel */
+    .auth-container {
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background: #f4f6f8;
+    }
+    .auth-box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .auth-box h1 {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: #333;
+    }
+    .auth-box p {
+      margin-bottom: 1.5rem;
+      color: #555;
+      line-height: 1.4;
+    }
+    .auth-box button, .auth-box a.button {
+      display: inline-block;
+      background: #ae1b2c;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .auth-box button:hover, .auth-box a.button:hover {
+      background: #8c1522;
+    }
+  </style>
+</head>
+<body>
 
+  <div class="canvas-wrap">
+    <!-- LEFT NAV BAR (same as Canvas-Layout) -->
+    <nav class="canvas-nav">
+      <div class="nav-brand"><h2>UMass</h2><p>Amherst</p></div>
+      <ul class="nav-list">
+        <li><a href="Authorization_Page.html" class="nav-item active"><div class="icon-box"></div><span class="nav-text">Auth</span></a></li>
+        <li><a href="Canvas-Layout.html" class="nav-item"><div class="icon-box"></div><span class="nav-text">StudyBuddy</span></a></li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="canvas-main">
+      <div class="auth-container">
+        <div class="auth-box">
+          <h1>Welcome to StudyBuddy</h1>
+          <p>
+            To access Canvas data (groups, courses, chats), you’ll need to generate
+            your own Canvas Access Token. Click the button below to open your
+            “Approved Integrations” page and add a new token.
+          </p>
+          <!-- JS‐driven button -->
+          <button id="goToken">Authorize StudyBuddy</button>
+          <!-- fallback link in case pop-ups are blocked -->
+          <p style="margin-top:0.5rem;">
+            <a
+              href="https://umass-amherst.instructure.com/profile/settings#approved_integrations"
+              target="_blank"
+              rel="noopener"
+              class="button"
+            >Or click here if nothing happens</a>
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // hard‐code the real Canvas host (no window.location.origin)
+    const canvasHost = 'https://umass-amherst.instructure.com';
+
+    document.getElementById('goToken').addEventListener('click', () => {
+      // this will open in a new tab
+      window.open(
+        `${canvasHost}/profile/settings#approved_integrations`,
+        '_blank',
+        'noopener'
+      );
+    });
+  </script>
+</body>
+</html>

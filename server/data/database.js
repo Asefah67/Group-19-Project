@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('chat.db');
-
+// this is for groups, members, and messages
 module.exports = db;
 
 db.serialize(() => {
