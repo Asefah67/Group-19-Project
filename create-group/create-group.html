@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Group</title>
+  <script type="module", src="../chat-room/chatRoom.js"></script>
   <link rel="stylesheet" type="text/css" href="/create-group/create-group.css">
 </head>
 <body>
@@ -39,6 +40,7 @@
       });
 
       if (response.ok) {
+        createGroup(groupName)
         window.location.href = 'group-home.html';
       } else {
         const error = await response.json();

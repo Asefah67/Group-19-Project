@@ -1,13 +1,10 @@
-const eventBus = require('../server/eventBus')
-
-
 let current_gc = "";
 const backend = 'http://localhost:3000';
 
 
 window.lastRender = {}
 
-eventBus.addEventListener('groupCreated', (group) => {
+eventBus.on('groupCreated', (group) => {
   const element = document.getElementById("conversation-list")
   element.innerHTML = ""
 
@@ -26,7 +23,7 @@ const viewMembersButton = document.getElementById("members");
 
 viewMembersButton.addEventListener("click", function(e) {
     let modal_over = document.getElementById("modalOverlay");
-    let members = message_logs[current_gc + "fakeServer"].get_members()
+    let members = message_logs[current_gc].get_members()
 
     document.getElementById("modalOverlay").style.display = 'flex';
 })
@@ -64,12 +61,18 @@ export function viewSwap(group) {
 }
 
 
-export function createGroup(element) {
-    element.innerHTML = ""
+export function createGroup(groupName) {
+  const element = document.getElementById("conversation-list")
+  element.innerHTML = ""
 
-    const new_gc = document.createElement('div')
-    new_gc.classList.add("conversation")
-    element.appendChild(new_gc);
+  const new_gc = document.createElement('div')
+  new_gc.classList.add("conversation")
+  new_gc.id = groupName
+  new_gc.onclick = viewSwap(new_gc)
+  
+  element.appendChild(new_gc);
+
+  lastRender[groupName] = null;
     
 }
 
