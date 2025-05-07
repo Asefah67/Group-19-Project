@@ -10,6 +10,7 @@
   "web_accessible_resources": [
   {
     "resources": [
+      "Canvas-Layout.html",                             
       "Canvas-CSS.css",
       "studybuddy-icon.svg",
       "views/room-booking/roombooking.html",
@@ -19,6 +20,7 @@
     "matches": ["*://*.instructure.com/*"]
   }
 ],
+
 
   "content_scripts": [
     {

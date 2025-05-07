@@ -1,42 +1,42 @@
-/* === tiny helper === */
+/* ========= tiny helper ========= */
 const $ = sel => document.querySelector(sel);
 
-/* === IndexedDB === */
+/* ========= work out URL to mock JSON =========
+   currentScript = ".../views/room-booking/js/room-booking.js"
+   we need        ".../views/room-booking/mock-data/du-bois-2025-04-10.json"
+*/
+const dataURL = new URL(
+  "../mock-data/du-bois-2025-04-10.json",
+  document.currentScript.src         // ← base = the JS file itself
+).toString();
+
+/* ========= IndexedDB (same as before) ========= */
 let db;
-indexedDB.open("studyBuddy", 1).onupgradeneeded = e => {
+indexedDB.open("studyBuddy",1).onupgradeneeded = e=>{
   db = e.target.result;
-  if (!db.objectStoreNames.contains("reservations")) {
-    db.createObjectStore("reservations", { keyPath: "id", autoIncrement: true });
+  if(!db.objectStoreNames.contains("reservations")){
+    db.createObjectStore("reservations",{keyPath:"id",autoIncrement:true});
   }
 };
-indexedDB.open("studyBuddy", 1).onsuccess = e => { db = e.target.result; };
+indexedDB.open("studyBuddy",1).onsuccess = e=>{ db = e.target.result; };
 
-/* === component state === */
-const chosen = new Set();   // “room|time”
+/* ========= state ========= */
+const chosen = new Set();
 let currentMeta = {};
 
-/* === initialise === */
-function init() {
+/* ========= fetch mock JSON & build grid ========= */
+function init(){
   $("#dateHeading").textContent =
     new Date($("#dateSel").value).toDateString();
 
-  /* fetch mock JSON from inside the extension package */
-  fetch(
-    chrome.runtime.getURL(
-      "views/room-booking/mock-data/du-bois-2025-04-10.json"
-    )
-  )
+  fetch(dataURL)
     .then(r => r.json())
     .then(drawGrid)
     .catch(console.error);
 }
-
-/* run immediately if DOM is ready, otherwise wait */
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",init);
+}else{ init(); }
 
 /* === draw grid === */
 function drawGrid(data) {

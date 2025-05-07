@@ -1,6 +1,15 @@
 /* OPTIONAL: Use Lato to closely match Canvas; fallback to sans-serif */
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
 
+/* Center the StudyBuddy triangle */
+.canvas-main.studybuddy-center{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:calc(100vh - 2rem);   /* take full viewport minus a little */
+  padding:0;                       /* cancel the 2‑rem pad defined above */
+}
+
 /* RESET */
 * {
   margin: 0;
@@ -134,6 +143,15 @@ body {
   align-items: center;
   text-align: center;
 }
+.feature-circle:hover{
+  background:#d8e3f2;               /* slightly lighter blue‑gray */
+  box-shadow:0 0 0 3px #ae1b2c inset;/* subtle maroon ring */
+  transform:scale(1.05);            /* gentle pop‑out */
+}
+.feature-circle:active{
+  transform:scale(0.98);
+  box-shadow:0 0 0 3px #8c1522 inset;
+}
 .feature-icon {
   font-size: 1.6rem;
   margin-bottom: 0.2rem;
@@ -227,3 +245,17 @@ body {
 
 /* scrollbar when grid wider than viewport */
 #gridWrapper { overflow: auto; }
+
+/* Center the StudyBuddy menu inside the Canvas workspace */
+.canvas-main.studybuddy-center{
+  display:flex;
+  justify-content:center;   /* horizontal */
+  align-items:center;       /* vertical   */
+  height:100%;
+  padding:0;                /* NEW → remove the 2 rem top padding */
+}
+
+/* keep a little breathing‑room on small screens */
+@media (max-height:650px){
+  .canvas-main.studybuddy-center{padding-top:1rem}
+}

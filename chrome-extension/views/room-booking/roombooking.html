@@ -2,35 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>StudyBuddy · Room Booking</title>
+  <title>StudyBuddy · Room Booking</title>
 
   <!-- global layout / nav -->
-  <!-- Canvas‑CSS sits one level up from this file -->
+  <!-- Canvas styles live one level up inside the extension package -->
   <link rel="stylesheet" href="../../Canvas-CSS.css">
-
   <!-- page‑only tweaks -->
   <style>
     .reservation-container{max-width:1000px;margin:0 auto;}
     .booking-filters{display:flex;flex-wrap:wrap;gap:1rem;margin:1.5rem 0}
-    .booking-filters select,
-    .booking-filters input[type="date"]{min-width:180px;padding:.4rem;border-radius:4px}
-    #confirmBtn{padding:.55rem 1.2rem;background:#ae1b2c;color:#fff;border:none;border-radius:4px;cursor:pointer}
+    .booking-filters select{min-width:180px;padding:.4rem;border-radius:4px}
+    #confirmBtn{padding:.55rem 1.2rem;background:#ae1b2c;color:#fff;
+                border:none;border-radius:4px;cursor:pointer}
     #confirmBtn:disabled{opacity:.4;cursor:not-allowed}
     #gridWrapper{margin-top:1rem;overflow:auto}
+    /* little trash icon */
     .trash{cursor:pointer;margin-left:.25rem;color:#c0392b;font-weight:700}
   </style>
 </head>
-
 <body>
 <div class="canvas-wrap">
 
-  <!-- ============ LEFT NAV (static replica) ============ -->
+  <!-- ===== LEFT NAV – full set again ===== -->
   <nav class="canvas-nav">
-    <div class="nav-brand">
-      <h2>UMass</h2>
-      <p>Amherst</p>
-    </div>
-
+    <div class="nav-brand"><h2>UMass</h2><p>Amherst</p></div>
     <ul class="nav-list">
       <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Account</span></a></li>
       <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Dashboard</span></a></li>
@@ -41,18 +36,17 @@
       <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">History</span></a></li>
       <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Studio</span></a></li>
       <li><a class="nav-item" href="#"><div class="icon-box"></div><span class="nav-text">Help</span></a></li>
-      <!-- links back to the triangle menu (adjust if you relocate Canvas-Layout.html) -->
-      <li><a class="nav-item" href="../Canvas-Layout.html">
-            <div class="icon-box"></div><span class="nav-text">StudyBuddy</span></a></li>
+      <li><a class="nav-item" href="../frontend/Canvas-Layout.html">
+          <div class="icon-box"></div><span class="nav-text">StudyBuddy</span></a></li>
     </ul>
   </nav>
 
-  <!-- ============ MAIN CONTENT ============ -->
+  <!-- ===== MAIN ===== -->
   <main class="canvas-main">
     <div class="reservation-container">
       <h1>Spaces & Reservations</h1>
 
-      <!-- ───── filter bar ───── -->
+      <!-- filter bar -->
       <div class="booking-filters">
         <label><strong>Location</strong><br>
           <select id="locationSel">
@@ -77,11 +71,11 @@
           <input type="date" id="dateSel" value="2025-04-10">
         </label>
 
-        <!-- confirm button -->
+        <!-- this is now our confirm button -->
         <button id="confirmBtn" disabled>Confirm Selection</button>
       </div>
 
-      <!-- ───── dynamic grid & selection list ───── -->
+      <!-- dynamic grid + selection read‑out -->
       <h2 id="dateHeading"></h2>
       <div id="gridWrapper"></div>
 
@@ -91,7 +85,6 @@
   </main>
 </div>
 
-<!-- same relative path, because js/ lives under room-booking/ -->
 <script src="js/room-booking.js" defer></script>
 </body>
 </html>
