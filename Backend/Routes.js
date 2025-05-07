@@ -6,12 +6,12 @@ const eventBus = require('./eventBus');
 const path = require('path');
 const dbPath = path.join(__dirname, 'database.sqlite')
 
-const db = new sqlite3.Database(dbPath);
+const db = require('../db.js');
 console.log('SQLite DB path:', dbPath);
 
 
 
-// Create tables if not exist
+/*// Create tables if not exist
 const ensureSchema = () => {
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS groups (
@@ -37,7 +37,7 @@ db.serialize(() => {
 });
 }
 
-ensureSchema();
+ensureSchema();*/
 
 function add_group(groupName) {
   db.run('INSERT INTO groups (name) VALUES (?)', [groupName], function (err) {
@@ -47,7 +47,7 @@ function add_group(groupName) {
   });
 }
 
-/*router.post('/groups', (req, res) => {
+router.post('/groups', (req, res) => {
   const { groupName } = req.body;
 
   db.get('SELECT * FROM groups WHERE name = ?', [groupName], (err, row) => {
@@ -57,7 +57,7 @@ function add_group(groupName) {
     add_group(groupName);
     res.status(201).json({ message: 'Group created' });
   });
-});*/
+});
 
 router.get('/groups', (req, res) => {
   const query = `

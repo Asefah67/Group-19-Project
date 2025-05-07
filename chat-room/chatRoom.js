@@ -14,6 +14,52 @@ viewMembersButton.addEventListener("click", function(e) {
     document.getElementById("modalOverlay").style.display = 'flex';
 })
 
+let last_gc = null;
+
+async function checkForNewGroups() {
+  console.log("Checking for new groups...")
+  try {
+    console.log("Fetching new groups...")
+    const response = await fetch(`${backend}/new-groups`);
+    console.log("Response:", response)
+    if (!response.ok) throw new Error('Network response was not ok');
+    const group = await response.json();
+
+    console.log("Group data:", group)
+    if (group.name && (group.name !== last_gc)) {
+        last_gc = group.name; 
+        const conversationList = document.getElementById('conversation-list');
+        const new_gc = document.createElement('div');
+        new_gc.classList.add('conversation');
+        new_gc.id = group.name;
+        new_gc.innerText = group.name;
+        new_gc.onclick = viewSwap(new_gc)
+        conversationList.appendChild(new_gc);
+        lastRender[group.name] = null;
+        console.log("Added new group:", group.name);
+    } else {
+      console.log("No new groups found.")
+    }
+  } catch (error) {
+    console.error('Error fetching new groups:', error); 
+  }
+
+  setTimeout(checkForNewGroups, 5000); // Poll every 5 seconds
+}
+
+// Start polling when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  
+  checkForNewGroups();
+
+  const savedGroup = localStorage.getItem('selectedGroup');
+    
+  if (savedGroup) {
+      const group = JSON.parse(savedGroup);
+      rendermsg(group); // ✅ Automatically reload last selected group
+  }
+
+})
 
 menu.addEventListener("click", function(e) {
     const dropdown = menu.nextElementSibling;
@@ -42,7 +88,9 @@ document.getElementById("close_members").addEventListener("click", function(e) {
 export function viewSwap(group) {
     current_gc = group.id;
     document.getElementById("chatMessages").innerHTML = '';
-    lastRender[current_gc] = null;
+    if (!lastRender[current_gc]) {
+      lastRender[current_gc] = null;
+    }
     rendermsg(group)
 }
 
@@ -90,6 +138,8 @@ async function rendermsg(group) {
     let id = group.id;
     current_gc = id;
 
+    localStorage.setItem('selectedGroup', JSON.stringify(group));
+
     document.getElementById("chatView").style.display = "none";
 
     document.getElementById("chatContainer").style.display = "flex";
@@ -124,19 +174,6 @@ async function rendermsg(group) {
         })
 }
   
-async function create_group_indb(groupName) {
-  const res = await fetch (`${backend}/groups`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      name: groupName
-    })
-  })
-
-  if (!res.ok) {
-    return new Error (`Cannot create group: ${res.status}`)
-  }
-}
 
 
 export async function handleSend(input_id) {
