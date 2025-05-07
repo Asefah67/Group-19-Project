@@ -1,30 +1,30 @@
 {
-    "name": "StudyBuddy Canvas Injector (SVG)",
-    "version": "1.0",
-    "description": "Inject a custom StudyBuddy link with an SVG icon into the Canvas left nav.",
-    "manifest_version": 3,
-  
-    "permissions": [
-      "activeTab",
-      "scripting"
+  "name": "StudyBuddy Canvas Injector",
+  "version": "1.0",
+  "description": "Injects StudyBuddy into Canvas",
+  "manifest_version": 3,
+
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["*://*.instructure.com/*"],
+
+  "web_accessible_resources": [
+  {
+    "resources": [
+      "Canvas-CSS.css",
+      "studybuddy-icon.svg",
+      "views/room-booking/roombooking.html",
+      "views/room-booking/js/room-booking.js",
+      "views/room-booking/mock-data/du-bois-2025-04-10.json"
     ],
-    "host_permissions": [
-      "*://umamherst.instructure.com/*"
-    ],
-  
-    "web_accessible_resources": [
-      {
-        "resources": ["studybuddy-icon.svg"],
-        "matches": ["*://umamherst.instructure.com/*"]
-      }
-    ],
-  
-    "content_scripts": [
-      {
-        "matches": ["*://umamherst.instructure.com/*"],
-        "js": ["content.js"],
-        "run_at": "document_start"
-      }
-    ]
+    "matches": ["*://*.instructure.com/*"]
   }
-  
+],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.instructure.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
