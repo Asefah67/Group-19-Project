@@ -1,32 +1,32 @@
-const express = require('express');
-const path = require('path');
-const app = express();
+  const express = require('express');
+  const path = require('path');
+  const app = express();
 
-// 🔁 Routes for your group feature
-const groupRoutes = require('./create-group/group-data-logic');
-const chatRoutes = require('./Backend/Routes');
+  // 🔁 Routes for your group feature
+  const groupRoutes = require('./create-group/group-data-logic');
+  const chatRoutes = require('./Backend/Routes');
 
-app.use(express.json());
+  app.use(express.json());
 
-// ✅ Serve your group's frontend (Study Group)
-app.use('/create-group', express.static(path.join(__dirname, 'create-group')));
+  // ✅ Serve your group's frontend (Study Group)
+  app.use('/create-group', express.static(path.join(__dirname, 'create-group')));
 
-// ✅ Serve Canvas landing + other pages
-app.use(express.static(path.join(__dirname, 'Landing Page')));
+  // ✅ Serve Canvas landing + other pages
+  app.use(express.static(path.join(__dirname, 'Landing Page')));
 
-// ✅ Serve chatroom UI
-app.use('/chat-room', express.static(path.join(__dirname, 'chat-room')));
+  // ✅ Serve chatroom UI
+  app.use('/chat-room', express.static(path.join(__dirname, 'chat-room')));
 
-// ✅ Mount backend routes
-app.use('/', groupRoutes);
-app.use('/', chatRoutes);
+  // ✅ Mount backend routes
+  app.use('/', groupRoutes);
+  app.use('/', chatRoutes);
 
-// ✅ Set landing page (Canvas) as root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Landing Page', 'Canvas-Layout.html'));
-});
+  // ✅ Set landing page (Canvas) as root
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Landing Page', 'Canvas-Layout.html'));
+  });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
-});
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`✅ Server running at http://localhost:${PORT}`);
+  });
