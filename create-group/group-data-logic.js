@@ -3,7 +3,14 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const router = express.Router();
-const db = new sqlite3.Database(path.join(__dirname, '../database.sqlite'));
+
+const db = new sqlite3.Database(path.join(__dirname, '../database.sqlite'), (err) => {
+  if (err) {
+    console.error('Error opening database:', err.message);
+  } else {
+    db.run('PRAGMA journal_mode = WAL;'); // Enable WAL mode
+  }
+});
 
 // Ensure table has className column
 const ensureSchema = () => {
@@ -24,6 +31,7 @@ const ensureSchema = () => {
 };
 
 ensureSchema();
+
 
 router.get('/groups', (req, res) => {
   const query = `
@@ -58,10 +66,12 @@ router.post('/create-group', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     if (row) return res.status(400).json({ error: 'Group already exists for that class' });
 
-    db.run(`INSERT INTO groups(name, className) VALUES (?, ?)`, [groupName, className], function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.status(201).json({ message: 'Group created successfully', id: this.lastID });
-    });
+    db.serialize(() => {
+        db.run(`INSERT INTO groups(name, className) VALUES (?, ?)`, [groupName, className], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ message: 'Group created successfully', id: this.lastID });
+          });
+    })
   });
 });
 
