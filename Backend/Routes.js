@@ -39,6 +39,15 @@ db.serialize(() => {
 
 ensureSchema();*/
 
+router.get('/get-groups', (req, res) => {
+  db.all(`SELECT * FROM groups`, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    res.json(rows); // ✅ Returns all groups
+  });
+});
+
+
 function add_group(groupName) {
   db.run('INSERT INTO groups (name) VALUES (?)', [groupName], function (err) {
     if (err) return;

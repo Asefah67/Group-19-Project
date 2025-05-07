@@ -66,6 +66,16 @@ router.get('/new-groups', (req, res) => {
   });
 });
 
+
+router.get('/get-groups', (req, res) => {
+  db.all(`SELECT * FROM groups`, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    res.json(rows); // ✅ Returns all groups
+  });
+});
+
+
 router.get('/groups', (req, res) => {
   const query = `
     SELECT g.id, g.name AS groupName, g.className, m.name AS memberName

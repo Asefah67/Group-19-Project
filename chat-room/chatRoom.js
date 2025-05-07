@@ -48,10 +48,34 @@ async function checkForNewGroups() {
 }
 
 // Start polling when the page loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async() => {
+
+  try {
+    const response = await fetch(`${backend}/get-groups`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    const groups = await response.json();
+
+    if (groups.length > 0) {
+      const conversationList = document.getElementById('conversation-list');
+      groups.forEach(group => {
+        const new_gc = document.createElement('div');
+        new_gc.classList.add('conversation');
+        new_gc.id = group.name;
+        new_gc.innerText = group.name;
+        new_gc.onclick = () => viewSwap(new_gc)
+        conversationList.appendChild(new_gc);
+        lastRender[group.name] = null;
+      });
+
+      console.log("Groups loaded:", groups);
+    } else {
+      console.log("No groups found.");
+    }
+  } catch (error) {
+    console.error('Error fetching groups:', error); 
+  }
   
   checkForNewGroups();
-
   const savedGroup = localStorage.getItem('selectedGroup');
     
   if (savedGroup) {
@@ -144,8 +168,9 @@ async function rendermsg(group) {
 
     document.getElementById("chatContainer").style.display = "flex";
 
-    document.getElementById("chatHeader").innerText = id;
+    document.getElementById("chatHeader").innerText = group.id;
 
+    try {
 
       let last_r ;
 
@@ -172,6 +197,9 @@ async function rendermsg(group) {
             })
           }
         })
+    }catch (e) {
+      console.error(`Error: ${e}`)
+    }
 }
   
 
