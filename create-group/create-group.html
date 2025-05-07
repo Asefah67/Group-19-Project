@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Group</title>
-  <script type="module", src="../chat-room/chatRoom.js"></script>
   <link rel="stylesheet" type="text/css" href="/create-group/create-group.css">
 </head>
 <body>
@@ -33,14 +32,15 @@
       const className = document.getElementById('class-name').value.trim();
       const groupName = document.getElementById('group-name').value.trim();
 
-      const response = await fetch('/create-group', {
+      const backend = 'http://localhost:3000';
+      const response = await fetch(`/create-group`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ className, groupName })
       });
 
       if (response.ok) {
-        createGroup(groupName)
+        console.log(response.ok);
         window.location.href = 'group-home.html';
       } else {
         const error = await response.json();
