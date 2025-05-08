@@ -1,20 +1,17 @@
-/*  app.js  – ONE Express server for everything
- * ──────────────────────────────────────────────────────────
- *  • front‑end folders:
- *      /Landing Page          (main Canvas mock‑up)
+/*  app.js  – ONE Express server for everything
+ * ───────────────────────────────────────────────────────────
+ *  Front‑end folders, all served statically:
+ *      /Landing Page          (Canvas mock‑up)
  *      /create-group
  *      /chat-room
- *      /room-booking          ← new static mount
+ *      /room-booking          ←  NEW
  *
- *  • back‑end:
- *      SQLite @  ./database.sqlite
- *      Reservations table     (Sequelize)
- *      GET  /api/rooms?location=&date=
- *      POST /api/reservations
- *          – saves into SQLite
- *          – overwrites the matching slot to "busy"
- *            in   server/data/rooms/<loc>-<yyyy-mm-dd>.json
- * -------------------------------------------------------- */
+ *  Back‑end:
+ *      • SQLite  (database.sqlite at project root)
+ *      • Reservations model via Sequelize
+ *      • GET  /api/rooms?location=&date=
+ *      • POST /api/reservations   (persists + overlays JSON)
+ * ───────────────────────────────────────────────────────────*/
 
 const express  = require('express');
 const cors     = require('cors');
@@ -25,10 +22,10 @@ const { Sequelize, DataTypes } = require('sequelize');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-/*───────────────────── 1.  DB (Sequelize + SQLite) ─────────────────────*/
+/*───────────────────────── 1.  DB (Sequelize + SQLite) ─────────────────*/
 const sequelize = new Sequelize({
   dialect : 'sqlite',
-  storage : path.join(__dirname, 'database.sqlite'), // <── root‑level file
+  storage : path.join(__dirname, 'database.sqlite'), // root‑level file
   logging : false,
 });
 
@@ -42,35 +39,42 @@ const Reservation = sequelize.define('Reservation', {
   group    : { type: DataTypes.STRING, allowNull: false },
 });
 
-/*───────────────────── 2.  MIDDLEWARE / STATIC ─────────────────────────*/
+/*───────────────────────── 2.  MIDDLEWARE / STATIC ─────────────────────*/
 app.use(cors());
 app.use(express.json());
 
-// ➜ Booking UI
-app.use('/room-booking',
-        express.static(path.join(__dirname, 'room-booking')));
+/* ► Room‑booking UI */
+app.use(
+  '/room-booking',
+  express.static(path.join(__dirname, 'room-booking'))
+);
 
-// ➜ Study‑group UI
-app.use('/create-group',
-        express.static(path.join(__dirname, 'create-group')));
+/* ► Study‑group UI */
+app.use(
+  '/create-group',
+  express.static(path.join(__dirname, 'create-group'))
+);
 
-// ➜ Chat‑room UI
-app.use('/chat-room',
-        express.static(path.join(__dirname, 'chat-room')));
+/* ► Chat‑room UI */
+app.use(
+  '/chat-room',
+  express.static(path.join(__dirname, 'chat-room'))
+);
 
-// ➜ Canvas landing page (root fallback for everything else)
+/* ► Canvas landing page (fallback for anything else) */
 app.use(express.static(path.join(__dirname, 'Landing Page')));
 
-/*───────────────────── 3.  OTHER TEAM ROUTES (unchanged) ───────────────*/
+/*───────────────────────── 3.  OTHER TEAM ROUTES ───────────────────────*/
 const groupRoutes = require('./create-group/group-data-logic');
 const chatRoutes  = require('./Backend/Routes');
 app.use('/', groupRoutes);
 app.use('/', chatRoutes);
 
-/*───────────────────── 4.  BOOKING API ENDPOINTS ───────────────────────*/
-// GET  /api/rooms?location=du-bois&date=2025-05-07
+/*───────────────────────── 4.  BOOKING API ENDPOINTS ───────────────────*/
+
+// GET /api/rooms?location=du-bois&date=2025-05-07
 app.get('/api/rooms', (req, res) => {
-  const loc  = (req.query.location || 'du-bois').toLowerCase();
+  const loc  = slugify(req.query.location || 'du-bois');
   const date =  req.query.date;
   if (!date) return res.status(400).json({ error: 'Missing date' });
 
@@ -79,13 +83,12 @@ app.get('/api/rooms', (req, res) => {
   );
 
   fs.readFile(jsonPath, 'utf8', (err, raw) => {
-    if (err) return res.status(404)
-                      .json({ error: 'No data for that day/loc' });
+    if (err) return res.status(404).json({ error: 'No data for that day/loc' });
     res.json(JSON.parse(raw));
   });
 });
 
-// POST /api/reservations
+// POST /api/reservations
 app.post('/api/reservations', async (req, res) => {
   try {
     const {
@@ -103,7 +106,7 @@ app.post('/api/reservations', async (req, res) => {
       return res.status(400).json({ error: 'Missing fields' });
     }
 
-    /* 1) write to DB  ───────────────────────────────────*/
+    /* 1) insert into SQLite */
     await Reservation.create({
       room, time, date,
       location: finalLoc,
@@ -111,15 +114,14 @@ app.post('/api/reservations', async (req, res) => {
       group: finalGroup,
     });
 
-    /* 2) mark slot busy in mock JSON  ─────────────────*/
+    /* 2) overlay “busy” into the day’s mock‑data JSON (if it exists) */
     const jsonPath = path.join(
       __dirname, 'server', 'data', 'rooms',
       `${finalLoc}-${date}.json`
     );
 
     fs.readFile(jsonPath, 'utf8', (err, raw) => {
-      if (err) return; // no mock file – silently skip
-
+      if (err) return; // no JSON file – silently skip
       try {
         const data = JSON.parse(raw);
         const idx  = data.rooms.findIndex(r => r.name === room);
@@ -127,7 +129,7 @@ app.post('/api/reservations', async (req, res) => {
           data.slots[idx][time] = 'busy';
           fs.writeFile(jsonPath, JSON.stringify(data, null, 2), () => {});
         }
-      } catch {/* malformed JSON → ignore */}
+      } catch {/* malformed JSON – ignore */ }
     });
 
     res.json({ status: 'ok' });
@@ -137,17 +139,25 @@ app.post('/api/reservations', async (req, res) => {
   }
 });
 
-/*───────────────────── 5.  LANDING PAGE ROOT ───────────────────────────*/
+/*───────────────────────── 5.  LANDING PAGE ROOT ───────────────────────*/
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname,
-                         'Landing Page',
-                         'Canvas-Layout.html'));
+  res.sendFile(
+    path.join(__dirname, 'Landing Page', 'Canvas-Layout.html')
+  );
 });
 
-/*───────────────────── 6.  BOOTSTRAP ───────────────────────────────────*/
+/*───────────────────────── 6.  BOOTSTRAP ───────────────────────────────*/
 (async () => {
-  await sequelize.sync();       // create table if needed
+  await sequelize.sync();   // create table if needed
   console.log('✅ Database synced');
   app.listen(PORT, () =>
-    console.log(`🚀 Server running at http://localhost:${PORT}`));
+    console.log(`🚀 Server running at http://localhost:${PORT}`)
+  );
 })();
+
+function slugify(val = '') {
+  return val.toLowerCase()
+            .replace(/[^\w]+/g, '-')   // spaces/punct → dash
+            .replace(/^-+|-+$/g, '');
+}
+
