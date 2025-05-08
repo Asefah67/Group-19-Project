@@ -153,6 +153,10 @@ document.getElementById("close_members").addEventListener("click", function(e) {
 
 
 export function viewSwap(group) {
+    if (current_gc === group.id) {
+      return;
+    }
+
     current_gc = group.id;
     document.getElementById("chatMessages").innerHTML = '';
     if (!lastRender[current_gc]) {
