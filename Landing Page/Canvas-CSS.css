@@ -227,3 +227,9 @@ body {
 
 /* scrollbar when grid wider than viewport */
 #gridWrapper { overflow: auto; }
+
+.hero-bg {
+  background: url("umass.png") center/cover no-repeat fixed;
+  position: relative;
+  isolation: isolate;
+}
