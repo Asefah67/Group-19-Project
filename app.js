@@ -1,10 +1,10 @@
-// app.js
 const express = require('express');
 const path = require('path');
 const app = express();
 
 // 🔁 Routes for your group feature
 const groupRoutes = require('./create-group/group-data-logic');
+const chatRoutes = require('./Backend/Routes');
 
 app.use(express.json());
 
@@ -14,8 +14,12 @@ app.use('/create-group', express.static(path.join(__dirname, 'create-group')));
 // ✅ Serve Canvas landing + other pages
 app.use(express.static(path.join(__dirname, 'Landing Page')));
 
-// ✅ Your backend API routes
-app.use('/api', groupRoutes);
+// ✅ Serve chatroom UI
+app.use('/chat-room', express.static(path.join(__dirname, 'chat-room')));
+
+// ✅ Mount backend routes
+app.use('/', groupRoutes);
+app.use('/', chatRoutes);
 
 // ✅ Set landing page (Canvas) as root
 app.get('/', (req, res) => {
