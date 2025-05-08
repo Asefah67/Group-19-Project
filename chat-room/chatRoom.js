@@ -7,15 +7,59 @@ window.lastRender = {}
 const menu = document.getElementById("menu-button");
 const viewMembersButton = document.getElementById("members");
 
-viewMembersButton.addEventListener("click", function(e) {
-    let modal_over = document.getElementById("modalOverlay");
-    let members = message_logs[current_gc].get_members()
 
-    document.getElementById("modalOverlay").style.display = 'flex';
-})
+function showProfile(memberName) {
+  // Implement the logic to show the member's profile 
+  let profileOverlay = document.getElementById("profileOverlay");
+  let profileName = document.getElementById("profileName");
+
+  profileName.innerText = memberName;
+  profileOverlay.style.display = "flex";
+}
+
+document.getElementById("close_profile").addEventListener("click", function(e) {
+  document.getElementById("profileOverlay").style.display = "none"
+});
+
+viewMembersButton.addEventListener("click", async function() {
+  let modalOverlay = document.getElementById("modalOverlay");
+  let membersListContainer = document.getElementById("members-list");
+
+
+  membersListContainer.innerHTML = "";
+
+  try {
+      // ✅ Fetch members from the backend
+      const response = await fetch(`${backend}/groups/${current_gc}/members`);
+      const members = await response.json();
+
+      if (members.length > 0) {
+          members.forEach(member => {
+              let memberElement = document.createElement("div");
+              memberElement.classList.add("member-list", "clickable");
+              memberElement.innerText = member.name; // Assuming each member has a 'name'
+              memberElement.addEventListener("click", function() {
+                showProfile(member.name); // Assuming you have a function to show the profile
+              })
+              membersListContainer.appendChild(memberElement);
+          });
+      } else {
+          membersListContainer.innerHTML = "<p>No members found.</p>";
+      }
+  } catch (error) {
+      console.error("Error fetching members:", error);
+      membersListContainer.innerHTML = "<p>Error loading members.</p>";
+  }
+  modalOverlay.style.display = "flex";
+});
+
+document.getElementById("close_members").addEventListener("click", function(e) {
+    document.getElementById("modalOverlay").style.display = "none"
+});
+
+
 
 let last_gc = null;
-
 async function checkForNewGroups() {
   console.log("Checking for new groups...")
   try {
