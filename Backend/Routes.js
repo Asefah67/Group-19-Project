@@ -68,6 +68,7 @@ router.post('/groups', (req, res) => {
   });
 });
 
+
 router.get('/groups', (req, res) => {
   const query = `
     SELECT g.id, g.name AS groupName, g.className, m.name AS memberName
@@ -90,6 +91,8 @@ router.get('/groups', (req, res) => {
   });
 });
 
+
+
 router.get('/groups/:id', (req, res) => {
   const id = req.params.id;
   db.get('SELECT * FROM groups WHERE id = ?', [id], (err, group) => {
@@ -109,6 +112,8 @@ router.get('/groups/:id', (req, res) => {
     });
   });
 });
+
+
 
 router.post('/create-group', (req, res) => {
   const { className, groupName } = req.body;
@@ -131,6 +136,7 @@ router.post('/create-group', (req, res) => {
     })
   });
 });
+
 
 
 router.post('/join-group', (req, res) => {
@@ -159,6 +165,23 @@ router.post('/join-group', (req, res) => {
     });
   });
 });
+
+
+router.delete('/groups/:groupName/:memberName', (req, res) => {
+  const { groupName, memberName } = req.params;
+
+  db.run(`DELETE FROM members WHERE groupName = ? AND memberName = ?`, [groupId, userId], function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+
+      // If no rows were deleted, the member wasn't in the group
+      if (this.changes === 0) {
+          return res.status(404).json({ message: "User not in the group" });
+      }
+
+      res.json({ message: "Successfully left the group" });
+  });
+});
+
 
 router.post('/groups/:groupName/messages', (req, res) => {
   const { groupName } = req.params;
