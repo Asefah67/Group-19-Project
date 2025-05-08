@@ -5,8 +5,8 @@
   <title>StudyBuddy · Room Booking</title>
 
   <!-- global layout / nav -->
-  <link rel="stylesheet" href="../frontend/Canvas-CSS.css">
-
+  <!-- Canvas styles live one level up inside the extension package -->
+  <link rel="stylesheet" href="../../Canvas-CSS.css">
   <!-- page‑only tweaks -->
   <style>
     .reservation-container{max-width:1000px;margin:0 auto;}
@@ -70,7 +70,6 @@
         <label><strong>Date</strong><br>
           <input type="date" id="dateSel" value="2025-04-10">
         </label>
-        <button id="searchBtn"   style="padding:.55rem 1.2rem">Search Slots</button>
 
         <!-- this is now our confirm button -->
         <button id="confirmBtn" disabled>Confirm Selection</button>

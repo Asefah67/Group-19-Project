@@ -4,6 +4,10 @@
         "Tiye"
     ],
     "liveServer.settings.ignoreFiles": [
-        "**/messages.json"
-    ]
+        "**/database.sqlite"
+    ],
+    
+    "liveServer.settings.wait": 10000000,
+
+
 }

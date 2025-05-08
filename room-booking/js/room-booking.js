@@ -1,85 +1,98 @@
-/* ========= tiny helper ========= */
+// chrome-extension/views/room-booking/js/room-booking.js
+
+// ─────── your API root ───────
+const API = 'http://localhost:3000';
+
 const $ = sel => document.querySelector(sel);
 
-/* ========= IndexedDB setup ========= */
-let db;
-indexedDB.open('studyBuddy', 1).onupgradeneeded = e => {
-  db = e.target.result;
-  if (!db.objectStoreNames.contains('reservations')) {
-    db.createObjectStore('reservations', { keyPath: 'id', autoIncrement: true });
+// ─────── set today's date in the picker ───────
+(() => {
+  const inp = $('#dateSel');
+  if (!inp) return;
+  inp.value = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+})();
+
+// ─────── build 30-min slots from 8 am → 8 pm ───────
+function buildTimes() {
+  const out = [];
+  for (let h = 8; h <= 20; h++) {
+    out.push(`${h}:00`);
+    if (h < 20) out.push(`${h}:30`);
   }
-};
-indexedDB.open('studyBuddy', 1).onsuccess = e => { db = e.target.result; };
+  return out;
+}
+const TIMES = buildTimes();
 
-/* ========= state ========= */
-const chosen = new Set();   // “room|time”
-let currentMeta = {};       // { room,time,date,loc }
+// ─────── selection state ───────
+const chosen = new Set();
+let currentMeta = {};
 
-/* ========= on-load & “Search Slots” button ========= */
-window.addEventListener('DOMContentLoaded', loadGrid);
-$('#searchBtn').addEventListener('click', loadGrid);
+// ─────── load & draw whenever date or location changes ───────
+async function loadDay() {
+  // 1) set heading
+  const [y, m, d] = $('#dateSel').value.split('-').map(Number);
+  $('#dateHeading').textContent = new Date(y, m - 1, d).toDateString();
 
-async function loadGrid() {
-  // clear previous grid & selection
-  $('#gridWrapper').innerHTML = '';
-  $('#selectionList').innerHTML = '';
-  chosen.clear();
-  $('#confirmBtn').disabled = true;
-
-  // update header date
-  const dateVal = $('#dateSel').value;
-  $('#dateHeading').textContent = new Date(dateVal).toDateString();
-
-  // fetch data from Express
-  const loc = $('#locationSel').value || 'du-bois';
-  const resp = await fetch(`http://localhost:3000/api/rooms?location=${loc}&date=${dateVal}`);
-  if (!resp.ok) {
-    alert('No data for that date/location');
-    return;
+  // 2) fetch from back-end
+  const loc  = ($('#locationSel').value || 'du-bois').toLowerCase();
+  const date = $('#dateSel').value; // "YYYY-MM-DD"
+  try {
+    const res = await fetch(`${API}/api/rooms?location=${loc}&date=${date}`);
+    if (!res.ok) throw new Error('No data for that day/loc');
+    const data = await res.json();
+    drawGrid(data);
+  } catch (err) {
+    console.warn(err);
+    $('#gridWrapper').innerHTML =
+      `<p style="color:#c0392b">No mock data for that day.</p>`;
+    $('#confirmBtn').disabled = true;
+    chosen.clear();
   }
-  const data = await resp.json();
-  drawGrid(data);
 }
 
-/* ========= build the grid ========= */
-function drawGrid(data) {
-  const times = [
-    '7:00','7:30','8:00','8:30','9:00','9:30',
-    '10:00','10:30','11:00','11:30','12:00','12:30','13:00'
-  ];
+// wire change events
+$('#dateSel').addEventListener('change', loadDay);
+$('#locationSel')?.addEventListener('change', loadDay);
 
+// initial load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadDay);
+} else {
+  loadDay();
+}
+
+// ─────── draw the grid ───────
+function drawGrid(data) {
   const wrap = $('#gridWrapper');
+  wrap.innerHTML = '';
+
   const g = document.createElement('div');
   g.className = 'slot-grid';
-  g.style.gridTemplateColumns = `200px repeat(${times.length},50px)`;
+  g.style.gridTemplateColumns = `200px repeat(${TIMES.length},50px)`;
 
-  // spacer top-left
+  // header row
   g.appendChild(document.createElement('div'));
-
-  // time headers
-  times.forEach(t => {
+  TIMES.forEach(t => {
     const h = document.createElement('div');
     h.className = 'slot-head';
     h.textContent = t;
     g.appendChild(h);
   });
 
-  // each room row
-  data.rooms.forEach((r, idx) => {
+  // room rows
+  data.rooms.forEach((room, idx) => {
     const lbl = document.createElement('div');
     lbl.className = 'slot-room';
-    lbl.textContent = `${r.name} (Cap ${r.cap})`;
+    lbl.textContent = `${room.name} (Cap ${room.cap})`;
     g.appendChild(lbl);
 
-    times.forEach(t => {
+    TIMES.forEach(t => {
       const cell = document.createElement('div');
-      const status = data.slots[idx][t] === 'busy' ? 'busy' : 'free';
-      cell.className = `slot-cell ${status}`;
-      cell.dataset.room = r.name;
+      const busy = data.slots[idx][t] === 'busy';
+      cell.className = `slot-cell ${busy ? 'busy' : 'free'}`;
+      cell.dataset.room = room.name;
       cell.dataset.time = t;
-      if (status === 'free') {
-        cell.addEventListener('click', () => toggle(cell));
-      }
+      if (!busy) cell.addEventListener('click', () => toggle(cell));
       g.appendChild(cell);
     });
   });
@@ -87,15 +100,15 @@ function drawGrid(data) {
   wrap.appendChild(g);
 }
 
-/* ========= selection UX ========= */
+// ─────── selection UX ───────
 function toggle(cell) {
-  const key = cell.dataset.room + '|' + cell.dataset.time;
+  const key = `${cell.dataset.room}|${cell.dataset.time}`;
   if (chosen.has(key)) {
     chosen.delete(key);
     cell.classList.remove('chosen');
   } else {
-    document.querySelectorAll('.chosen').forEach(c => c.classList.remove('chosen'));
     chosen.clear();
+    document.querySelectorAll('.chosen').forEach(c => c.classList.remove('chosen'));
     chosen.add(key);
     cell.classList.add('chosen');
   }
@@ -105,6 +118,7 @@ function toggle(cell) {
 function renderSelection() {
   const list = $('#selectionList');
   list.innerHTML = '';
+
   if (!chosen.size) {
     $('#confirmBtn').disabled = true;
     return;
@@ -115,49 +129,35 @@ function renderSelection() {
     room,
     time,
     date: $('#dateSel').value,
-    loc : $('#locationSel').value || 'du-bois'
+    loc:  $('#locationSel')?.value || 'du-bois'
   };
 
   const li = document.createElement('li');
   li.textContent = `${room} – ${time}`;
   const trash = document.createElement('span');
-  trash.textContent = ' 🗑';
   trash.className = 'trash';
-  trash.addEventListener('click', () => {
-    chosen.clear();
-    renderSelection();
-  });
+  trash.textContent = '🗑';
+  trash.addEventListener('click', () => { chosen.clear(); renderSelection(); });
   li.appendChild(trash);
   list.appendChild(li);
 
   $('#confirmBtn').disabled = false;
 }
 
-/* ========= confirmation modal ========= */
+// ─────── confirmation modal & POST ───────
 $('#confirmBtn').addEventListener('click', openConfirmation);
 
 function openConfirmation() {
   // backdrop
   const bg = document.createElement('div');
-  bg.style.cssText = `
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.5);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:99
-  `;
+  bg.style.cssText =
+    'position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:99';
 
-  // dialog box
+  // modal box
   const box = document.createElement('div');
-  box.style.cssText = `
-    background:#fff;
-    padding:2rem 2.5rem;
-    border-radius:6px;
-    max-width:420px;
-    width:100%
-  `;
+  box.style.cssText =
+    'background:#fff;padding:2rem 2.5rem;border-radius:6px;max-width:420px;width:100%';
+
   box.innerHTML = `
     <h2 style="margin-top:0">Booking Details</h2>
     <table style="width:100%;margin-bottom:1rem;border-collapse:collapse">
@@ -170,68 +170,56 @@ function openConfirmation() {
     <label>Email (@umass.edu)*<br><input id="email" style="width:100%"></label><br><br>
     <label>Group Size*<br>
       <select id="groupSize" style="width:100%">
-        <option value="">Select…</option><option>3-5</option><option>More than 5</option>
+        <option value="">Select…</option>
+        <option>3–5</option>
+        <option>More than 5</option>
       </select>
     </label><br><br>
-    <button
-      id="submitBtn"
-      style="
-        padding:.5rem 1rem;
-        background:#26a65b;
-        color:#fff;
-        border:none;
-        border-radius:4px;
-        cursor:pointer
-      "
-    >
+    <button id="submitBtn"
+      style="padding:.5rem 1rem;background:#26a65b;color:#fff;border:none;border-radius:4px">
       Submit my Booking
-    </button>
-  `;
+    </button>`;
 
   bg.appendChild(box);
   document.body.appendChild(bg);
 
-  // handle submit
+  // POST handler
   $('#submitBtn').addEventListener('click', async () => {
-    const name  = $('#fullName').value.trim();
-    const email = $('#email').value.trim();
-    const group = $('#groupSize').value;
-    if (!name || !email.endsWith('@umass.edu') || !group) {
-      return alert('Please fill out every required field.');
+    if (
+      !$('#fullName').value ||
+      !$('#email').value.endsWith('@umass.edu') ||
+      !$('#groupSize').value
+    ) {
+      alert('Please fill out every required field.');
+      return;
     }
 
-    // 1️⃣ POST to your Express backend
-    await fetch('http://localhost:3000/api/reservations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: currentMeta.loc,
-        date    : currentMeta.date,
-        room    : currentMeta.room,
-        time    : currentMeta.time,
-        name,
-        email,
-        group
-      })
-    });
+    const payload = {
+      room:     currentMeta.room,
+      time:     currentMeta.time,
+      date:     currentMeta.date,
+      location: currentMeta.loc,
+      name:     $('#fullName').value,
+      email:    $('#email').value,
+      group:    $('#groupSize').value
+    };
 
-    // 2️⃣ also add local copy to IndexedDB
-    const transaction = db.transaction('reservations','readwrite');
-    const store       = transaction.objectStore('reservations');
-    const req         = store.add({ ...currentMeta, name, email, group });
-    req.onsuccess = () => {
-      alert('Reservation stored (server + local)');
-      bg.remove();
+    try {
+      const resp = await fetch(`${API}/api/reservations`, {
+        method:  'POST',
+        headers: {'Content-Type':'application/json'},
+        body:    JSON.stringify(payload)
+      });
+      if (!resp.ok) throw new Error('Booking failed');
+      alert('Reservation saved!');
+      bg.remove();      // close modal
       chosen.clear();
-      renderSelection();
-    };
-    req.onerror = () => {
-      alert('Failed to save locally');
-    };
+      loadDay();        // redraw grid (new slot now “busy”)
+    } catch (err) {
+      alert(err.message);
+    }
   });
 
-  // close when clicking outside box
-  bg.addEventListener('click', e => {
-    if (e.target === bg) bg.remove();
-  });
+  // close on backdrop click
+  bg.addEventListener('click', e => { if (e.target === bg) bg.remove(); });
 }

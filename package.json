@@ -2,14 +2,19 @@
   "name": "group-19-project",
   "version": "1.0.0",
   "description": "Study Buddy – Team 19",
+
   "scripts": {
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "start": "node app.js"
+
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "fs": "^0.0.1-security",
-    "node-canvas-api": "^2.0.0"
+    "node-canvas-api": "^2.0.0",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
   }
 }
