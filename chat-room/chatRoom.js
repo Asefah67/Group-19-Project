@@ -29,7 +29,6 @@ viewMembersButton.addEventListener("click", async function() {
   membersListContainer.innerHTML = "";
 
   try {
-      // ✅ Fetch members from the backend
       const response = await fetch(`${backend}/groups/${current_gc}/members`);
       const members = await response.json();
 
@@ -88,10 +87,10 @@ async function checkForNewGroups() {
     console.error('Error fetching new groups:', error); 
   }
 
-  setTimeout(checkForNewGroups, 5000); // Poll every 5 seconds
+  setTimeout(checkForNewGroups, 5000); 
 }
 
-// Start polling when the page loads
+
 document.addEventListener('DOMContentLoaded', async() => {
 
   try {
@@ -124,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     
   if (savedGroup) {
       const group = JSON.parse(savedGroup);
-      rendermsg(group); // ✅ Automatically reload last selected group
+      rendermsg(group); 
   }
 
 })

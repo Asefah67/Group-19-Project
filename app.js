@@ -1,17 +1,5 @@
 /*  app.js  – ONE Express server for everything
- * ───────────────────────────────────────────────────────────
- *  Front‑end folders, all served statically:
- *      /Landing Page          (Canvas mock‑up)
- *      /create-group
- *      /chat-room
- *      /room-booking          ←  NEW
- *
- *  Back‑end:
- *      • SQLite  (database.sqlite at project root)
- *      • Reservations model via Sequelize
- *      • GET  /api/rooms?location=&date=
- *      • POST /api/reservations   (persists + overlays JSON)
- * ───────────────────────────────────────────────────────────*/
+*/
 
 const express  = require('express');
 const cors     = require('cors');
